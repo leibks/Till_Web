@@ -8,7 +8,7 @@ function TeacherView( {match} ) {
   return (
     <div className="teacher-view">
         <LeftSidePanel panelType="teacherPanel" />
-        <div className="main-view-content">
+        <div>
           <Switch>
             <Route path={match.url} exact component={TeacherDashboard}/>
             <Route path={`${match.url}/students`} exact>

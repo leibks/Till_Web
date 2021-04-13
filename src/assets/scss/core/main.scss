@@ -1,4 +1,5 @@
-@import "../colors.scss";
+@import "../core/components.scss";
+@import "../core/components.scss";
 
 body {
     margin: 0px;
@@ -16,14 +17,14 @@ code {
 }
 
 .app {
-    min-width: 700px;
+    min-width: 1000px;
 }
 
 
 // teacher view: I
 .teacher-view {
     width: 100%;
-    min-width: 900px;
+    min-width: 1000px;
     height: 700px;
 }
 
@@ -32,7 +33,7 @@ code {
     z-index: 0;
     float: left;
     width: 8%;
-    min-width: 72px;
+    min-width: 80px;
     box-sizing: border-box;
     border-right: 1px solid black;
     
@@ -64,7 +65,7 @@ code {
 .main-view-content {
     width: 92%;
     background-color: white;
-    min-width: 720px;
+    min-width: 920px;
     float: right;
 }
 
@@ -92,15 +93,41 @@ code {
 // users list: III
 .users-list {
     width: 20%;
-    min-width: 200px;
+    min-width: 184px;
     height: 670px;
-    overflow: auto;
+    // overflow-y: auto;
+    // overflow-x: auto;
     background-color: $background-color2;
     padding-left: 20px;
     float: left;
+    position: relative;
 
-    .user-item :hover {
-        font-weight: 500;
+    .custom-user-nav {
+        color: $main-color;
+        height: 60px;
+        width: 250px;
+
+        :hover {
+            font-weight: 500;
+        }
+
+        .user-img {
+            height: 40xp;
+            width: 40px;
+
+            img {
+                height: 40px;
+                width: 40px;
+            }
+        }
+
+        .user-name {
+            float: left;
+            font-size: 16px;
+            padding: 10px 0px 10px 60px;
+            text-align: left;
+        }
+
     }
 }
 
@@ -108,74 +135,53 @@ code {
 // view content: III
 .view-content {
     float: left;
-    width: 80%;
+    width: calc(80% - 20px);
     max-width: 1000px;
+    min-width: 700px;
 
     .content-header {
         padding: 20px;
-        width: 100%;
-        
-        .user-item {
-            width: 300px;
-
-            .user-name {
-                position: absolute;
-                height: 60px;
-                padding: 0;
-                padding-left: 60px;
-                font-size: 18px;
-
-                span {
-                    color: black;
-                    font-size: 15px;
-                }
-            }
-            .img-box {
-                padding-top: 5px;
-            }
-        }
     }
 }
-
 
 
 // general components
-.user-item {
-    height: 60px;
-    color: $main-color;
-    margin-bottom: 5px;
-    cursor: pointer;
+// .user-item {
+//     height: 60px;
+//     color: $main-color;
+//     margin-bottom: 5px;
+//     cursor: pointer;
 
-    .user-name {
-        float: left;
-        font-size: 16px;
-        padding: 15px;
-        padding-top: 10px;
-        text-align: left;
-        padding-left: 60px;
-    }
+//     .user-name {
+//         float: left;
+//         font-size: 16px;
+//         padding: 15px;
+//         padding-top: 10px;
+//         text-align: left;
+//         padding-left: 60px;
+//     }
 
-    .img-box {
-        position: absolute;
-        height: 40xp;
-        width: 40px;
+//     .img-box {
+//         position: absolute;
+//         height: 40xp;
+//         width: 40px;
 
         
-        img {
-            float: left;
-            height: 40px;
-            width: 40px;
-        }
-    }
-}
+//         img {
+//             float: left;
+//             height: 40px;
+//             width: 40px;
+//         }
+//     }
+// }
 
-.select-item {
-    .img-box {
-        background-color: rgba(0,0,0,0);
-        border-radius: 50%;
-        border: 4px solid $main-color;
-    }
-    .user-name {
-        font-weight: 650;
-    }
-}
+// .select-item {
+//     .img-box {
+//         background-color: rgba(0,0,0,0);
+//         border-radius: 50%;
+//         border: 4px solid $main-color;
+//     }
+//     .user-name {
+//         font-weight: 650;
+//     }
+// }
