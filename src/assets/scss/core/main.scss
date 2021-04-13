@@ -1,0 +1,181 @@
+@import "../colors.scss";
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+  
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}
+
+.app {
+    min-width: 700px;
+}
+
+
+// teacher view: I
+.teacher-view {
+    width: 100%;
+    min-width: 900px;
+    height: 700px;
+}
+
+// left side panel: II 
+.left-side-panel {
+    z-index: 0;
+    float: left;
+    width: 8%;
+    min-width: 72px;
+    box-sizing: border-box;
+    border-right: 1px solid black;
+    
+    .panel-header {
+        color: $main-color;
+        height: 60px;
+        margin: 25%;
+    }
+
+    .panel-content {
+        margin-top: 60px;
+        height: 600px;
+        width: auto;
+
+        .panel-item {
+            padding: 32%;
+            cursor: pointer;
+        }
+    }
+
+    .selected-item {
+        z-index: 1;
+        background-color: $background-color2;
+    }
+   
+}
+
+// main view content: II
+.main-view-content {
+    width: 92%;
+    background-color: white;
+    min-width: 720px;
+    float: right;
+}
+
+// content header: III
+.main-content-header {
+    height: 50px;
+    border-bottom: 2px solid black;
+    text-align: center;
+    font-weight: 600;
+    font-size: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+// profile box: III
+.profile-box {
+    position: relative;
+    float: right;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 10px;
+    cursor: pointer;
+}
+
+// users list: III
+.users-list {
+    width: 20%;
+    min-width: 200px;
+    height: 670px;
+    overflow: auto;
+    background-color: $background-color2;
+    padding-left: 20px;
+    float: left;
+
+    .user-item :hover {
+        font-weight: 500;
+    }
+}
+
+
+// view content: III
+.view-content {
+    float: left;
+    width: 80%;
+    max-width: 1000px;
+
+    .content-header {
+        padding: 20px;
+        width: 100%;
+        
+        .user-item {
+            width: 300px;
+
+            .user-name {
+                position: absolute;
+                height: 60px;
+                padding: 0;
+                padding-left: 60px;
+                font-size: 18px;
+
+                span {
+                    color: black;
+                    font-size: 15px;
+                }
+            }
+            .img-box {
+                padding-top: 5px;
+            }
+        }
+    }
+}
+
+
+
+// general components
+.user-item {
+    height: 60px;
+    color: $main-color;
+    margin-bottom: 5px;
+    cursor: pointer;
+
+    .user-name {
+        float: left;
+        font-size: 16px;
+        padding: 15px;
+        padding-top: 10px;
+        text-align: left;
+        padding-left: 60px;
+    }
+
+    .img-box {
+        position: absolute;
+        height: 40xp;
+        width: 40px;
+
+        
+        img {
+            float: left;
+            height: 40px;
+            width: 40px;
+        }
+    }
+}
+
+.select-item {
+    .img-box {
+        background-color: rgba(0,0,0,0);
+        border-radius: 50%;
+        border: 4px solid $main-color;
+    }
+    .user-name {
+        font-weight: 650;
+    }
+}
