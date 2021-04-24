@@ -12,7 +12,7 @@ function TeacherView( {match} ) {
           <Switch>
             <Route path={match.url} exact component={TeacherDashboard}/>
             <Route path={`${match.url}/students`} exact>
-              <StudentView teacherId="1864" ></StudentView>
+              <StudentView teacherId="1864"></StudentView>
             </Route> 
           </Switch>
         </div>

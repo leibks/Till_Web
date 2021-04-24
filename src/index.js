@@ -5,6 +5,7 @@ import { createBrowserHistory } from "history";
 
 import './assets/scss/style.scss';
 import './assets/scss/core/main.scss';
+import "./assets/scss/core/components.scss";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 

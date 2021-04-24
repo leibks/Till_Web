@@ -1,61 +1,47 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import AppLogo from '../assets/images/app-logo.svg'
 import StudentButtom from '../assets/images/icons/student-button.svg'
 import MessageButtom from '../assets/images/icons/message-button.svg'
 import CalendarButtom from '../assets/images/icons/calendar-button.svg'
 import SettingButtom from '../assets/images/icons/setting-button.svg'
-import { Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom';
+// import { useHistory } from 'react-router'
 
-function initiateItemClass() {
-    return {
-        "student": "",
-        "message": "",
-        "calendar": "",
-        "setting": "",
-    }
-}
+const LeftSidePanel = (props) => {
+    const [selectBar, setSelectBar] = useState("");
 
-function LeftSidePanel({
-    panelType
-}) {
-    const [itemClasses, setItemClasses] = useState(() => initiateItemClass());
-
-    function handleItemClassChange(prevState, buttonTyep) {
-        return {
-            ...prevState,
-            [buttonTyep]: "selected-item"
-        };
-    }
-
-    function switchView(e) {
-        if (e.target.tagName === "IMG") {
-            const buttonTyep = e.target.alt;
-            setItemClasses(prevState => initiateItemClass())
-            setItemClasses((prevState) => handleItemClassChange(prevState, buttonTyep))
+    const switchView = useCallback((e) => {
+        const view = e.target.id
+        setSelectBar(e.target.id);
+        if (view === "main") {
+            props.history.push("/teacher")
+        } else {
+            props.history.push(`/teacher/${e.target.id}`)
         }
         
-    }
+    }, [props.history])
+
     return (
         <div className="left-side-panel">
-            <div className="panel-header" onClick={initiateItemClass}> 
-                <Link to="/teacher"> <img alt="" src={AppLogo} /> </Link>
+            <div id="main" className="panel-header" onClick={(e) => switchView(e)}> 
+                <img alt="" src={AppLogo} />
             </div>
             <div className="panel-content" onClick={(e) => switchView(e)}>
-                <div className={`panel-item ${itemClasses.student}`} >
-                    <Link to="/teacher/students"> <img alt="student" src={StudentButtom}></img> </Link>
+                <div id="students" className={`panel-item ${selectBar === "students" ? "selected-item" : ""}`} >
+                    <img id="students" alt="student" src={StudentButtom}></img>
                 </div>
-                <div className={`panel-item ${itemClasses.message}`}>
-                    <Link to="/teacher/message"> <img alt="message" src={MessageButtom}></img> </Link>
+                <div id="messages" className={`panel-item ${selectBar === "messages" ? "selected-item" : ""}`}>
+                    <img id="messages" alt="message" src={MessageButtom}></img>
                 </div>
-                <div className={`panel-item ${itemClasses.calendar}`}>
-                    <Link to="/teacher/calendar"> <img alt="calendar" src={CalendarButtom}></img> </Link>
+                <div id="calendars" className={`panel-item ${selectBar === "calendars" ? "selected-item" : ""}`}>
+                    <img id="calendars" alt="calendar" src={CalendarButtom}></img>
                 </div>
-                <div className={`panel-item ${itemClasses.setting}`}>
-                    <Link to="/teacher/setting"> <img alt="setting" src={SettingButtom}></img> </Link>
+                <div id="settings" className={`panel-item ${selectBar === "settings" ? "selected-item" : ""}`}>
+                     <img id="settings" alt="setting" src={SettingButtom}></img>
                 </div>
             </div>
         </div>
     )
 }
 
-export default LeftSidePanel;
+export default withRouter((props) => LeftSidePanel(props));

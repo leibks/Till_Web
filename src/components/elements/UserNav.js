@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import BoyProfileSample from "../../assets/images/boy-profile-sample.svg";
 import GirlProfileSample from "../../assets/images/girl-profile-sample.svg";
 
@@ -12,12 +12,14 @@ function UserNav({
 }) {
 
     return (
-        <div className={`user-nav ${customStyles}  ${isSelect ? "select-item" : ""}`}
-             onClick={(e) => setSelectFunction(user)}
+        <div 
+            className={`user-nav ${customStyles}  ${isSelect ? "select-item" : ""}`}
+            onClick={(e) => setSelectFunction(user)}
         >
             <div className={`user-img`}>
-                <img alt={userId} 
-                     src={user.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
+                <img 
+                    alt={userId} 
+                    src={user.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
                 </img>
             </div>
             <div className="user-name"> 
