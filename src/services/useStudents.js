@@ -24,10 +24,22 @@ const useStudents = () => {
         return await response.json();
     }
 
+    async function getStudentPerfoByStudentIdandTeacherId(teacherId, studentId) {
+        const response = await fetch(`http://localhost:8080/students/performances/?studentId=${studentId}&teacherId=${teacherId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            method: "Get"
+        });
+        return await response.json();
+    }
+
     return useMemo(
         () => ({
             getStudentsByTeacherId,
-            getStudentInfoByStudentId
+            getStudentInfoByStudentId,
+            getStudentPerfoByStudentIdandTeacherId
         }),
         []
     )

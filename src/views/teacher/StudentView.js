@@ -8,6 +8,39 @@ import Button from "../../components/elements/Button";
 import InfoCard from "../../components/elements/InfoCard";
 import useStudents from "../../services/useStudents";
 import useFamilies from "../../services/useFamilies";
+import Exclamation from "../../assets/images/shapes/exclamation.svg"
+import Circle from "../../assets/images/shapes/circle.svg"
+import Triangle from "../../assets/images/shapes/triangle.svg"
+import FiveStar from "../../assets/images/shapes/fiveStar.svg"
+
+
+const PERFORMLEVELS = [Exclamation, Triangle, Circle, FiveStar]
+const LEVELDIC = {
+    paticipation: {
+        "needs more participation": 0,
+        "somewhat participating": 1,
+        "actively participating": 2,
+        "excellent": 3
+    },
+    behavior: {
+        "interrupts class": 0,
+        "often distracted": 1,
+        "socializes with friends well": 2,
+        "follows rules well": 3
+    },
+    teamwork: {
+        "disruptive or irresponsive": 0,
+        "reserved": 1,
+        "working well with others": 2,
+        "showing leadership": 3
+    },
+    assignment: {
+        "turns in none/little": 0,
+        "turns in some assignments": 1,
+        "turns in most assignments": 2,
+        "turns in all assignments": 3
+    }
+}
 
 function StudentView({
     teacherId
@@ -15,15 +48,23 @@ function StudentView({
     const [students, setSutdents] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [cardContents, setCardContents] = useState([]);
+    const [performances, setPerformances] = useState([]);
     const [selectView, SetSelectView] = useState("");
     const [viewHeader, SetViewHeader] = useState("");
-    const { getStudentsByTeacherId, getStudentInfoByStudentId } = useStudents();
+    const { getStudentsByTeacherId, getStudentInfoByStudentId, 
+        getStudentPerfoByStudentIdandTeacherId } = useStudents();
     const { getFamilyByStudentId } = useFamilies();
 
     const handleGetStudentsByTeacherId = useCallback(async () => {
         const students = await getStudentsByTeacherId(teacherId)
         setSutdents(students);
     }, [getStudentsByTeacherId, teacherId]);
+
+    const handGetStudentPerformance = useCallback(async () => {
+        const performance = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectedStudent.id);
+        console.log(performance);
+        setPerformances(performance)
+    }, [teacherId, selectedStudent, getStudentPerfoByStudentIdandTeacherId])
 
     const handleGetFamilyInfo = useCallback(async () => {
         const family = await getFamilyByStudentId(selectedStudent.id);
@@ -98,20 +139,28 @@ function StudentView({
                 handleGetStudentInfo()
             } else if (selectView === "familyInfo") {
                 handleGetFamilyInfo()
+            } else if (selectView === "studentPerform") {
+                handGetStudentPerformance()
             }
         }
-    }, [selectedStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo]);
+    }, [selectedStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, handGetStudentPerformance]);
 
     const handleClickInput = (e) => {
         console.log("handle click the 'input performance' button in student view")
     };
+
+    const convertDate = useCallback((date) => {
+        const curDate = new Date(date);
+        const output = curDate.toLocaleString('default', { month: 'long',  day: 'numeric'});
+        return output;
+    }, [])
 
     return (
         <div className="main-view-content">
             <div className="profile-box"> <img alt="teacher-profile" src={TeacherProfileSample}></img> </div>
             <ContentHeader headerName="Student View" />
             <div className="users-list">
-                <span> Students </span>
+                <div className="list-header"> Students </div>
                 {students.map((student) => {
                     return (
                         <UserNav
@@ -129,7 +178,7 @@ function StudentView({
             {selectedStudent &&
             <div className="view-content">
                 <div className="content-header">
-                    <div className="user-nav custom-user-nav">
+                    <div className="user-nav custom-user-nav disable-hover">
                         <img 
                             className="user-img"
                             alt={selectedStudent.id} 
@@ -178,7 +227,25 @@ function StudentView({
                             <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data} />
                         )
                     }))}
-                    {selectView === "studentPerform" && "student performance"}
+                    {selectView === "studentPerform" && 
+                    (<div className="perform-calendar">
+                        <div className="row-titles">
+                            <div className="row-title"> Participation </div>
+                            <div className="row-title"> Behavior </div>
+                            <div className="row-title"> Teamwork </div>
+                            <div className="row-title"> Assignment </div>
+                        </div>
+                        {performances.map((col, idx) => {
+                            return (
+                            <div key={idx} className="col-data">
+                                <div>{convertDate(col.updateDate)}</div>
+                                <img src={PERFORMLEVELS[LEVELDIC["paticipation"][col.participation]]} alt="particate"></img>
+                                <img src={PERFORMLEVELS[LEVELDIC["behavior"][col.behavior]]} alt="behavior"></img>
+                                <img src={PERFORMLEVELS[LEVELDIC["teamwork"][col.teamwork]]} alt="teamwork"></img>
+                                <img src={PERFORMLEVELS[LEVELDIC["assignment"][col.assignment]]} alt="assignment"></img>
+                            </div>)
+                        })}
+                    </div>)}
                 </div>
             </div>}
             {selectedStudent == null &&

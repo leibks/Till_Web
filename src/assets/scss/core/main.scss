@@ -112,10 +112,11 @@ code {
     text-align: left;
     padding-top: 25px;
 
-    span {
+    .list-header {
         font-size: 24px;
         font-weight: 600;
         margin-left: 20px;
+        margin-bottom: 15px;
     }
 
     .custom-user-nav:hover {
@@ -179,6 +180,10 @@ code {
             }
         }
 
+        .disable-hover {
+            pointer-events: none;
+        }
+
         .button {
             float: right;
             cursor: pointer;
@@ -223,5 +228,53 @@ code {
         width: calc(100% - 80px);
         padding: 0px 40px;
         overflow-y: auto;
+
+        .perform-calendar {
+            min-width: 800px;
+            height: 220px;
+            border: 1px solid black;
+            width: calc(100% - 140px);
+            border-radius: 20px;
+            padding: 10px 0px 30px 30px;
+            margin-right: 40px;
+
+            .row-titles {
+                text-align: left;
+                float: left;
+                margin: 30px 40px 0px 20px;
+                .row-title {
+                    margin: 20px 0px;
+                    font-size: 20px;
+                    font-weight: 650;
+                }
+            }
+
+            .col-data:hover {
+                background-color: #E8F0F2;
+                border-radius: 10px;
+                font-size: 18px;
+                font-weight: 650;
+            }
+
+            .col-data {
+                cursor: pointer;
+                text-align: center;
+                font-size: 16px;
+                height: 240px;
+                float: left;
+                width: 80px;
+                padding: 0px 10px;
+
+                div {
+                    margin-bottom: 20px;
+                }
+
+                img {
+                    width: 32px;
+                    height: 32px;
+                    padding: 10px 10px 0px 10px;
+                }
+            }
+        }
     }
 }
