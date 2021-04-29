@@ -45,7 +45,7 @@ code {
 
     .panel-content {
         margin-top: 60px;
-        height: 750px;
+        height: 780px;
         width: auto;
 
         .panel-item {
@@ -103,7 +103,7 @@ code {
 .users-list {
     width: 20%;
     min-width: 184px;
-    height: 800px;
+    height: 825px;
     // overflow-y: auto;
     // overflow-x: auto;
     background-color: $background-color2;
@@ -209,9 +209,20 @@ code {
             width: calc(100% / 3);
             border-right: 1px solid black;
             text-align: center;
-            padding-top: 25px;
+            // padding: 25px 5% 0px 5%;
             font-size: 18px;
             font-weight: 500;
+            vertical-align: middle;
+
+            .inner {
+                width: 220px;
+                height: 55px;
+                margin: 0px auto;
+                padding-top: 25px;
+                img {
+                    float: left;
+                }
+              }
         }
 
         .select {
@@ -245,7 +256,6 @@ code {
                 .row-title {
                     margin: 20px 0px;
                     font-size: 20px;
-                    font-weight: 650;
                 }
             }
 
@@ -273,6 +283,42 @@ code {
                     width: 32px;
                     height: 32px;
                     padding: 10px 10px 0px 10px;
+                }
+            }
+        }
+        .perform-detail {
+            height: 420px;
+            width: calc(100% - 80px);
+            // background-color: antiquewhite;
+            margin: 50px 80px 50px 0px;
+
+            .date-title {
+                float: left;
+                height: 120px;
+                width: 100px;
+                text-align: center;
+                font-size: 42px;
+                font-weight: 500;
+                padding: 50px 20px 50px 10px;
+                border-right: 2px solid black;
+
+                .edit {
+                    font-size: 24px;
+                }
+            }
+
+            .detail-item {
+                min-height: 100px;
+                margin-left: 150px;
+                margin-bottom: 20px;
+                text-align: justify;
+
+                .title {
+                    font-size: 20px;
+                    font-weight: 650;
+                    float: left;
+                    margin-right: 10px;
+                    margin-bottom: 5px;
                 }
             }
         }

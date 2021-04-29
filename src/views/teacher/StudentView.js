@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react"
-import ContentHeader from '../../layouts/ContentHeader'
-import TeacherProfileSample from "../../assets/images/teacher-profile-sample.svg"
+import React, { useEffect, useState, useCallback } from "react";
+import ContentHeader from '../../layouts/ContentHeader';
+import TeacherProfileSample from "../../assets/images/teacher-profile-sample.svg";
 import BoyProfileSample from "../../assets/images/boy-profile-sample.svg";
 import GirlProfileSample from "../../assets/images/girl-profile-sample.svg";
 import UserNav from "../../components/elements/UserNav";
@@ -8,10 +8,13 @@ import Button from "../../components/elements/Button";
 import InfoCard from "../../components/elements/InfoCard";
 import useStudents from "../../services/useStudents";
 import useFamilies from "../../services/useFamilies";
-import Exclamation from "../../assets/images/shapes/exclamation.svg"
-import Circle from "../../assets/images/shapes/circle.svg"
-import Triangle from "../../assets/images/shapes/triangle.svg"
-import FiveStar from "../../assets/images/shapes/fiveStar.svg"
+import Exclamation from "../../assets/images/shapes/exclamation.svg";
+import Circle from "../../assets/images/shapes/circle.svg";
+import Triangle from "../../assets/images/shapes/triangle.svg";
+import FiveStar from "../../assets/images/shapes/fiveStar.svg";
+import Edit from "../../assets/images/icons/edit.svg";
+import User from "../../assets/images/icons/user.svg";
+import Users from "../../assets/images/icons/users.svg";
 
 
 const PERFORMLEVELS = [Exclamation, Triangle, Circle, FiveStar]
@@ -46,11 +49,13 @@ function StudentView({
     teacherId
 }) {
     const [students, setSutdents] = useState([]);
-    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [selectStudent, setSelectStudent] = useState(null);
     const [cardContents, setCardContents] = useState([]);
     const [performances, setPerformances] = useState([]);
-    const [selectView, SetSelectView] = useState("");
-    const [viewHeader, SetViewHeader] = useState("");
+    const [selectView, setSelectView] = useState("");
+    const [viewHeader, setViewHeader] = useState("");
+    const [selectPerform, setSelectPerform] = useState(null);
+    
     const { getStudentsByTeacherId, getStudentInfoByStudentId, 
         getStudentPerfoByStudentIdandTeacherId } = useStudents();
     const { getFamilyByStudentId } = useFamilies();
@@ -61,13 +66,12 @@ function StudentView({
     }, [getStudentsByTeacherId, teacherId]);
 
     const handGetStudentPerformance = useCallback(async () => {
-        const performance = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectedStudent.id);
-        console.log(performance);
-        setPerformances(performance)
-    }, [teacherId, selectedStudent, getStudentPerfoByStudentIdandTeacherId])
+        const performanceList = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectStudent.id);
+        setPerformances(performanceList)
+    }, [teacherId, selectStudent, getStudentPerfoByStudentIdandTeacherId])
 
     const handleGetFamilyInfo = useCallback(async () => {
-        const family = await getFamilyByStudentId(selectedStudent.id);
+        const family = await getFamilyByStudentId(selectStudent.id);
         const cards = [
             {
                 cardName: "Primary Contact",
@@ -89,15 +93,15 @@ function StudentView({
             }
         ];
         setCardContents(cards);
-    }, [getFamilyByStudentId, selectedStudent]);
+    }, [getFamilyByStudentId, selectStudent]);
 
     const handleGetStudentInfo = useCallback(async () => {
-        const studentInfo = await getStudentInfoByStudentId(selectedStudent.id);
+        const studentInfo = await getStudentInfoByStudentId(selectStudent.id);
         const cards = [ 
             {
                 cardName: "Basic Information", 
                 data: [
-                        {name: "Full Name", text: selectedStudent.firstName + " " + selectedStudent.middleName + " " + selectedStudent.lastName},
+                        {name: "Full Name", text: selectStudent.firstName + " " + selectStudent.middleName + " " + selectStudent.lastName},
                         {name: "Date of Birth", text: studentInfo.dateOfBirth},
                         {name: "Language", text: studentInfo.firstLanguage + "," + studentInfo.homeLanguage}
                     ]
@@ -118,23 +122,28 @@ function StudentView({
             }
         ] 
         setCardContents(cards);
-    }, [getStudentInfoByStudentId, selectedStudent]);
+    }, [getStudentInfoByStudentId, selectStudent]);
     
-    const handleSelectView = useCallback((e) => {
-        SetSelectView(e.target.id);
-        SetViewHeader(e.target.textContent);
+    const handleSelectView = useCallback((type, header) => {
+        // clean up the old view data
+        setCardContents([]);
+        setPerformances([]);
+        setSelectPerform(null);
+        // set the new view
+        setSelectView(type);
+        setViewHeader(header);
     }, []);
 
     useEffect(() => {
         if (teacherId) {
             handleGetStudentsByTeacherId()
         }
-        SetSelectView("studentInfo");
-        SetViewHeader("Student Information");
+        setSelectView("studentInfo");
+        setViewHeader("Student Information");
     }, [teacherId, handleGetStudentsByTeacherId]);
 
     useEffect(() => {
-        if (selectedStudent) {
+        if (selectStudent) {
             if (selectView === "studentInfo") {
                 handleGetStudentInfo()
             } else if (selectView === "familyInfo") {
@@ -143,7 +152,7 @@ function StudentView({
                 handGetStudentPerformance()
             }
         }
-    }, [selectedStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, handGetStudentPerformance]);
+    }, [selectStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, handGetStudentPerformance]);
 
     const handleClickInput = (e) => {
         console.log("handle click the 'input performance' button in student view")
@@ -169,86 +178,110 @@ function StudentView({
                             user={student}
                             userId={student.id}
                             userType="student"
-                            isSelect={selectedStudent && student.id === selectedStudent.id}
-                            setSelectFunction={setSelectedStudent}
+                            isSelect={selectStudent && student.id === selectStudent.id}
+                            setSelectFunction={setSelectStudent}
                         />
                     )
                 })}
             </div>
-            {selectedStudent &&
+            {selectStudent &&
             <div className="view-content">
                 <div className="content-header">
                     <div className="user-nav custom-user-nav disable-hover">
                         <img 
                             className="user-img"
-                            alt={selectedStudent.id} 
-                            src={selectedStudent.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
+                            alt={selectStudent.id} 
+                            src={selectStudent.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
                         </img>
-                        <div className="user-name"> 
-                            <div>    
-                                {selectedStudent.firstName} {selectedStudent.middleName} {selectedStudent.lastName}
-                            </div>
-                            <span>ID: {selectedStudent.id} </span>
+                        <div className="user-name">
+                            <div>{selectStudent.firstName} {selectStudent.middleName} {selectStudent.lastName}</div>
+                            <span>ID: {selectStudent.id} </span>
                         </div>
                     </div>
                     <div className="button" >
-                        <Button
-                            text="Input Peformance" 
-                            height="35px" 
-                            handleClick={handleClickInput}
-                            width="250px" 
-                            fontSize="18px"
-                        >
-                        </Button>
+                        <Button text="Input Peformance" height="35px" handleClick={handleClickInput} width="250px" fontSize="18px"></Button>
                     </div>
                 </div>
-                <div className="nav-switch-bars" onClick={handleSelectView}>
+                <div className="nav-switch-bars">
                     <div 
-                        className={`switch-bar ${selectView === "studentPerform" ? "select" : ""}`} 
-                        id="studentPerform"> 
-                        Student Performance 
+                        onClick={() => handleSelectView("studentPerform", "Student Performance")}
+                        className={`switch-bar ${selectView === "studentPerform" ? "select" : ""}`}>
+                        <div className="inner"> <img src={Edit} alt="edit"></img> Student Performance </div>
                     </div>
                     <div 
-                        className={`switch-bar ${selectView === "studentInfo" ? "select" : ""}`} 
-                        id="studentInfo">
-                        Student Information 
+                        onClick={() => handleSelectView("studentInfo", "Student Information")}
+                        className={`switch-bar ${selectView === "studentInfo" ? "select" : ""}`} id="studentInfo">
+                        <div className="inner"> <img src={User} alt="user"></img> Student Information </div>
                     </div>
                     <div 
-                        className={`switch-bar ${selectView === "familyInfo" ? "select" : ""}`} 
-                        id="familyInfo"> 
-                        Family Information 
+                        onClick={() => handleSelectView("familyInfo", "Family Information")}
+                        className={`switch-bar ${selectView === "familyInfo" ? "select" : ""}`} id="familyInfo"> 
+                        <div className="inner"> <img src={Users} alt="users"></img> Family Information </div>
                     </div>
                 </div>
                 <div className="content">
                     <h1>{viewHeader}</h1>
                     {(selectView === "studentInfo" || selectView === "familyInfo") &&
-                    cardContents.map((card => {
-                        return (
-                            <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data} />
-                        )
-                    }))}
+                    cardContents.map(card => <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data}></InfoCard>)}
                     {selectView === "studentPerform" && 
                     (<div className="perform-calendar">
                         <div className="row-titles">
-                            <div className="row-title"> Participation </div>
-                            <div className="row-title"> Behavior </div>
-                            <div className="row-title"> Teamwork </div>
-                            <div className="row-title"> Assignment </div>
+                            {["Participation", "Behavior", "Teamwork", "Assignment"].map(
+                                text => <div key={text} className="row-title"> {text} </div>
+                            )}
                         </div>
                         {performances.map((col, idx) => {
                             return (
-                            <div key={idx} className="col-data">
+                            <div key={idx} className="col-data" onClick={(e) => setSelectPerform(col)}>
                                 <div>{convertDate(col.updateDate)}</div>
-                                <img src={PERFORMLEVELS[LEVELDIC["paticipation"][col.participation]]} alt="particate"></img>
+                                <img src={PERFORMLEVELS[LEVELDIC["paticipation"][col.participation]]} alt="partipate"></img>
                                 <img src={PERFORMLEVELS[LEVELDIC["behavior"][col.behavior]]} alt="behavior"></img>
                                 <img src={PERFORMLEVELS[LEVELDIC["teamwork"][col.teamwork]]} alt="teamwork"></img>
                                 <img src={PERFORMLEVELS[LEVELDIC["assignment"][col.assignment]]} alt="assignment"></img>
                             </div>)
                         })}
                     </div>)}
+                    {selectPerform &&
+                    <div className="perform-detail">
+                        <div className="date-title"> {convertDate(selectPerform.updateDate)} </div>
+                        <div className="detail-item"> 
+                            <div className="title">Participation</div> 
+                            <img src={PERFORMLEVELS[LEVELDIC["paticipation"][selectPerform.participation]]} alt="partipate"></img>
+                            <div>
+                                Rick actively particiates in class and is good at socializing with other students. 
+                                However, he tends to interrupt class oftentimes while other students or I was talking. 
+                                Also, some assignments were not turned in. 
+                            </div>
+                        </div>
+                        <div className="detail-item"> 
+                            <div className="title">Behavior</div> 
+                            <img src={PERFORMLEVELS[LEVELDIC["behavior"][selectPerform.behavior]]} alt="behavior"></img>
+                            <div>
+                                Rick actively particiates in class and is good at socializing with other students. 
+                                However, he tends to interrupt class oftentimes while other students or I was talking.
+                                Also, some assignments were not turned in. 
+                            </div>
+                        </div>
+                        <div className="detail-item"> 
+                            <div className="title">Teamwork</div> 
+                            <img src={PERFORMLEVELS[LEVELDIC["teamwork"][selectPerform.teamwork]]} alt="teamwork"></img>
+                            <div>
+                                Struggling to share with his peers. 
+                            </div>
+                        </div>
+                        <div className="detail-item">
+                            <div className="title">Assignment</div> 
+                            <img src={PERFORMLEVELS[LEVELDIC["assignment"][selectPerform.assignment]]} alt="assignment"></img>
+                            <div>
+                                Rick actively particiates in class and is good at socializing with other students. 
+                                However, he tends to interrupt class oftentimes while other students or I was talking. 
+                                Also, some assignments were not turned in. 
+                            </div>
+                        </div>
+                    </div> }
                 </div>
             </div>}
-            {selectedStudent == null &&
+            {selectStudent == null &&
             <div className="blank-content">Click on a Student Profile</div>}
         </div>
     )
