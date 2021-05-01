@@ -4,14 +4,13 @@
     width: 100%;
     height: 100%;
     text-align: center;
-    border-radius: 25px;
     padding-top: 5px;
     background-color: $main-button-color;
     color: $main-button-text-color;
 }
 
 .user-nav {
-    color: $main-color;
+    color: $till-pink;
     cursor: pointer;
 
     .user-img {
@@ -27,7 +26,7 @@
     .user-img {
         background-color: rgba(0,0,0,0);
         border-radius: 50%;
-        border: 4px solid $main-color;
+        border: 4px solid $till-pink;
     }
     .user-name {
         font-weight: 650;
@@ -62,6 +61,91 @@
             .content-text {
                 font-size: 20px;
             }
+        }
+    }
+}
+
+.calendar {
+    width: 200px;
+    margin-bottom: 50px;
+}
+
+.input-perform-form {
+    width: 100%;
+    min-height: 80px;
+
+    .header {
+        cursor: pointer;
+        width: 100%;
+        height: 30px;
+
+        div {
+            float: left;
+            margin-right: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        svg {
+            float: left;
+            margin-top: 5px;
+        }
+        img {
+            width: 24px;
+            height: 18px;
+            float: left;
+            margin-top: 10px;
+        }
+    }
+
+    .radio-options {
+        height: 200px;
+        width: 90%;
+        margin-top: 20px;
+
+        .radio-option:hover {
+            border: 1px solid black;
+        }
+
+        .radio-option {
+            cursor: pointer;
+            float: left;
+            width: calc((100% - 45px) / 2);
+            height: 50px;
+            border-radius: 10px;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border: 1px solid #ccc;
+            
+            span {
+                text-transform: capitalize;
+                margin-left: 20px;
+                font-size:18px;
+                font-weight: 500;
+            }
+
+            .ratio-circle {
+                float: left;
+                height: 20px;
+                width: 20px;
+                margin-left: 20px;
+                border: 1px solid #bbb;
+                background-color: white;
+                border-radius: 50%;
+            }
+        }
+
+        .radio-option:nth-of-type(1) {
+            color: $cautionary-red;
+        }
+        .radio-option:nth-of-type(2) {
+            color: $progress-yellow;
+        }
+        .radio-option:nth-of-type(3) {
+            color: $great-green;
+        }
+        .radio-option:nth-of-type(4) {
+            color: $exception-blue;
         }
     }
 }

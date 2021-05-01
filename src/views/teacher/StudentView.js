@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from '@material-ui/core/TextField';
 import ContentHeader from '../../layouts/ContentHeader';
 import TeacherProfileSample from "../../assets/images/teacher-profile-sample.svg";
 import BoyProfileSample from "../../assets/images/boy-profile-sample.svg";
@@ -15,50 +17,67 @@ import FiveStar from "../../assets/images/shapes/fiveStar.svg";
 import Edit from "../../assets/images/icons/edit.svg";
 import User from "../../assets/images/icons/user.svg";
 import Users from "../../assets/images/icons/users.svg";
-
+import InputPerformForm from "../../components/sections/inputPerformForm";
 
 const PERFORMLEVELS = [Exclamation, Triangle, Circle, FiveStar]
+const performanceTypes = ["participation", "behavior", "teamwork", "assignment"]
 const LEVELDIC = {
-    paticipation: {
-        "needs more participation": 0,
-        "somewhat participating": 1,
-        "actively participating": 2,
-        "excellent": 3
+    participation: { "needs more participation": 0, "somewhat participating": 1, "actively participating": 2, "excellent": 3},
+    behavior: { "interrupts class": 0, "often distracted": 1, "socializes with friends well": 2, "follows rules well": 3},
+    teamwork: { "disruptive or irresponsive": 0, "reserved": 1, "working well with others": 2, "showing leadership": 3},
+    assignment: { "turns in none/little": 0, "turns in some assignments": 1, "turns in most assignments": 2, "turns in all assignments": 3}
+}
+
+const useStyles = makeStyles((theme) => ({
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
     },
-    behavior: {
-        "interrupts class": 0,
-        "often distracted": 1,
-        "socializes with friends well": 2,
-        "follows rules well": 3
+    textField: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: 200,
     },
-    teamwork: {
-        "disruptive or irresponsive": 0,
-        "reserved": 1,
-        "working well with others": 2,
-        "showing leadership": 3
-    },
-    assignment: {
-        "turns in none/little": 0,
-        "turns in some assignments": 1,
-        "turns in most assignments": 2,
-        "turns in all assignments": 3
-    }
+}));
+
+const convertDate = (date) => {
+    const curDate = new Date(date);
+    return curDate.toLocaleString('default', { month: 'long',  day: 'numeric'});
+}
+
+const convertDateFormat = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() < 10 ? "0"+(date.getMonth() + 1).toString() : date.getMonth();
+    const day = date.getDate() < 10 ? "0"+date.getDate().toString() : date.getDate();
+    const convertedDate =  `${year}-${month}-${day}`;
+    // console.log( `${year}-${month}-${day}`);
+    return convertedDate;
 }
 
 function StudentView({
     teacherId
 }) {
+    const classes = useStyles();
     const [students, setSutdents] = useState([]);
     const [selectStudent, setSelectStudent] = useState(null);
-    const [cardContents, setCardContents] = useState([]);
-    const [performances, setPerformances] = useState([]);
     const [selectView, setSelectView] = useState("");
     const [viewHeader, setViewHeader] = useState("");
+
+    const [cardContents, setCardContents] = useState([]);
+    const [performances, setPerformances] = useState([]);
     const [selectPerform, setSelectPerform] = useState(null);
-    
-    const { getStudentsByTeacherId, getStudentInfoByStudentId, 
-        getStudentPerfoByStudentIdandTeacherId } = useStudents();
+    const [inputPerform, setInputPerform] = useState({
+        "id": "", "studentId": "", "teacherId": "", "updateDate": "", "participation": "",
+        "behavior": "", "teamwork": "", "assignment": "", "pNote": "", "bNote": "", "tNode": "", "aNode": ""
+    })
+    const [performDate, setPerformDate] = useState(convertDateFormat(new Date()))
+    const [isEdit, setIsEdit] = useState(false);
+
+    const { getStudentsByTeacherId, getStudentInfoByStudentId,
+        getStudentPerfoByStudentIdandTeacherId, createOrUpdatePerformance } = useStudents();
     const { getFamilyByStudentId } = useFamilies();
+
+    // TODO: implement debounce
 
     const handleGetStudentsByTeacherId = useCallback(async () => {
         const students = await getStudentsByTeacherId(teacherId)
@@ -67,7 +86,7 @@ function StudentView({
 
     const handGetStudentPerformance = useCallback(async () => {
         const performanceList = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectStudent.id);
-        setPerformances(performanceList)
+        setPerformances(performanceList);
     }, [teacherId, selectStudent, getStudentPerfoByStudentIdandTeacherId])
 
     const handleGetFamilyInfo = useCallback(async () => {
@@ -125,24 +144,82 @@ function StudentView({
     }, [getStudentInfoByStudentId, selectStudent]);
     
     const handleSelectView = useCallback((type, header) => {
-        // clean up the old view data
-        setCardContents([]);
-        setPerformances([]);
-        setSelectPerform(null);
-        // set the new view
         setSelectView(type);
         setViewHeader(header);
     }, []);
 
+    const handleSubmitPerformance = useCallback(async (e) => {
+        // setId
+        setInputPerform(prevState => {
+            prevState["id"] = teacherId + "+" + selectStudent.id + "+" + prevState["updateDate"];
+            return prevState;
+        })
+        // check valid date
+        if (new Date(inputPerform["updateDate"]).getTime() > new Date().getTime()) {
+            alert("Please do not select future date")
+            return;
+        }
+        // check empty performance
+        let emptyPerform = "";
+        for (let type of performanceTypes) {
+            if (inputPerform[type] === "") emptyPerform += (type + ",");
+        }
+        console.log(inputPerform);
+        if (emptyPerform !== "") {
+            alert("Please select performances for " + emptyPerform.substring(0, emptyPerform.length - 1));
+            return;
+        }
+        try {
+            await createOrUpdatePerformance(inputPerform);
+            alert("create or update performance successfully")
+            handleSelectView("studentPerform", "student Performance")
+        } catch (exception) {
+            console.log(exception);
+        }
+    }, [inputPerform, teacherId, selectStudent, createOrUpdatePerformance, handleSelectView]);
+
+    const handleDateChange = useCallback((date) => {
+        setPerformDate(date.target.value);
+        const updateDate =  date.target.value.replaceAll('-', '/');
+        setInputPerform(prevState => {
+            prevState["updateDate"] = updateDate
+            prevState["id"] = teacherId + "+" + selectStudent.id + "+" + updateDate;
+            return prevState;
+        })
+    }, [teacherId, selectStudent]);
+
+    const handleEditPerform = useCallback(() => {
+        setInputPerform(selectPerform);
+        setPerformDate(selectPerform.updateDate.replaceAll("/", "-"));
+        setIsEdit(true);
+        handleSelectView("inputPerform", "Input Performance")
+    }, [handleSelectView, selectPerform, setIsEdit])
+
+    const cleanUpOldData = useCallback(() => {
+        // clean up the old view data
+        setCardContents([]);
+        setPerformances([]);
+        setSelectPerform(null);
+    }, [])
+
+    // on mount function
     useEffect(() => {
         if (teacherId) {
             handleGetStudentsByTeacherId()
+            setSelectView("studentInfo");
+            setViewHeader("Student Information");
         }
-        setSelectView("studentInfo");
-        setViewHeader("Student Information");
     }, [teacherId, handleGetStudentsByTeacherId]);
 
+    // when switch view
     useEffect(() => {
+        cleanUpOldData();
+        if (!isEdit) {
+            setInputPerform(prevState => {
+                for (let key in prevState)  prevState[key] = "";
+                return prevState;
+            })
+        }
         if (selectStudent) {
             if (selectView === "studentInfo") {
                 handleGetStudentInfo()
@@ -150,19 +227,23 @@ function StudentView({
                 handleGetFamilyInfo()
             } else if (selectView === "studentPerform") {
                 handGetStudentPerformance()
+            } else if (selectView === "inputPerform") {
+                if (isEdit) {
+                    setIsEdit(false);
+                    return;
+                }
+                console.log("remove")
+                // fill the id, studentId, teacherId
+                setInputPerform(prevState => {
+                    prevState["studentId"] = selectStudent.id;
+                    prevState["teacherId"] = teacherId;
+                    prevState["updateDate"] = convertDateFormat(new Date());
+                    return prevState;
+                })
             }
         }
-    }, [selectStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, handGetStudentPerformance]);
-
-    const handleClickInput = (e) => {
-        console.log("handle click the 'input performance' button in student view")
-    };
-
-    const convertDate = useCallback((date) => {
-        const curDate = new Date(date);
-        const output = curDate.toLocaleString('default', { month: 'long',  day: 'numeric'});
-        return output;
-    }, [])
+    }, [teacherId, selectStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, 
+        handGetStudentPerformance, cleanUpOldData]);
 
     return (
         <div className="main-view-content">
@@ -199,7 +280,10 @@ function StudentView({
                         </div>
                     </div>
                     <div className="button" >
-                        <Button text="Input Peformance" height="35px" handleClick={handleClickInput} width="250px" fontSize="18px"></Button>
+                        <Button text="Input Peformance" height="35px" 
+                            handleClick={(e) => handleSelectView("inputPerform", "Input Performance")} 
+                            width="250px" borderRadius="20px" fontSize="18px">
+                        </Button>
                     </div>
                 </div>
                 <div className="nav-switch-bars">
@@ -221,10 +305,37 @@ function StudentView({
                 </div>
                 <div className="content">
                     <h1>{viewHeader}</h1>
+                    {selectView === "inputPerform" && 
+                    <div className="perform-input">
+                        <Button 
+                            text="Submit" 
+                            height="40px" handleClick={() => handleSubmitPerformance()}
+                            width="240px" borderRadius="30px" fontSize="20px">
+                        </Button>
+                        <div className="calendar">
+                            <form className={classes.container} noValidate>
+                                <TextField
+                                    id="date"
+                                    label="Performance Date Picker"
+                                    type="date"
+                                    onChange={handleDateChange}
+                                    value={performDate}
+                                    className={classes.textField}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </form>
+                        </div>
+                        {["participation", "behavior", "teamwork", "assignment"].map(
+                            text => <InputPerformForm key={text} inputType={text} isEdit={isEdit} oldPerform={selectPerform}
+                            setInputPerform={setInputPerform} ></InputPerformForm>
+                        )}
+                    </div>}
                     {(selectView === "studentInfo" || selectView === "familyInfo") &&
                     cardContents.map(card => <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data}></InfoCard>)}
                     {selectView === "studentPerform" && 
-                    (<div className="perform-calendar">
+                    <div className="perform-calendar">
                         <div className="row-titles">
                             {["Participation", "Behavior", "Teamwork", "Assignment"].map(
                                 text => <div key={text} className="row-title"> {text} </div>
@@ -232,51 +343,40 @@ function StudentView({
                         </div>
                         {performances.map((col, idx) => {
                             return (
-                            <div key={idx} className="col-data" onClick={(e) => setSelectPerform(col)}>
+                            <div key={idx} className={`col-data ${selectPerform && (selectPerform.id === col.id) ? "select" : ""}`} 
+                                onClick={(e) => setSelectPerform(col)}>
                                 <div>{convertDate(col.updateDate)}</div>
-                                <img src={PERFORMLEVELS[LEVELDIC["paticipation"][col.participation]]} alt="partipate"></img>
-                                <img src={PERFORMLEVELS[LEVELDIC["behavior"][col.behavior]]} alt="behavior"></img>
-                                <img src={PERFORMLEVELS[LEVELDIC["teamwork"][col.teamwork]]} alt="teamwork"></img>
-                                <img src={PERFORMLEVELS[LEVELDIC["assignment"][col.assignment]]} alt="assignment"></img>
+                                {performanceTypes.map(
+                                    text => <img key={text} src={PERFORMLEVELS[LEVELDIC[text][col[text]]]} alt={text}></img>
+                                )}
                             </div>)
                         })}
-                    </div>)}
+                    </div>}
                     {selectPerform &&
                     <div className="perform-detail">
-                        <div className="date-title"> {convertDate(selectPerform.updateDate)} </div>
+                        <div className="date-title"> 
+                            {convertDate(selectPerform.updateDate)}
+                            <div onClick={handleEditPerform} className="edit"> edit </div> 
+                        </div>
                         <div className="detail-item"> 
                             <div className="title">Participation</div> 
-                            <img src={PERFORMLEVELS[LEVELDIC["paticipation"][selectPerform.participation]]} alt="partipate"></img>
-                            <div>
-                                Rick actively particiates in class and is good at socializing with other students. 
-                                However, he tends to interrupt class oftentimes while other students or I was talking. 
-                                Also, some assignments were not turned in. 
-                            </div>
+                            <img src={PERFORMLEVELS[LEVELDIC["participation"][selectPerform.participation]]} alt="partipate"></img>
+                            <div> {selectPerform.pNote == null ? selectPerform.participation : selectPerform.pNote} </div>
                         </div>
                         <div className="detail-item"> 
                             <div className="title">Behavior</div> 
                             <img src={PERFORMLEVELS[LEVELDIC["behavior"][selectPerform.behavior]]} alt="behavior"></img>
-                            <div>
-                                Rick actively particiates in class and is good at socializing with other students. 
-                                However, he tends to interrupt class oftentimes while other students or I was talking.
-                                Also, some assignments were not turned in. 
-                            </div>
+                            <div> {selectPerform.bNote == null ? selectPerform.behavior : selectPerform.bNote} </div>
                         </div>
                         <div className="detail-item"> 
                             <div className="title">Teamwork</div> 
                             <img src={PERFORMLEVELS[LEVELDIC["teamwork"][selectPerform.teamwork]]} alt="teamwork"></img>
-                            <div>
-                                Struggling to share with his peers. 
-                            </div>
+                            <div> {selectPerform.tNote == null ? selectPerform.teamwork : selectPerform.tNote} </div>
                         </div>
                         <div className="detail-item">
                             <div className="title">Assignment</div> 
                             <img src={PERFORMLEVELS[LEVELDIC["assignment"][selectPerform.assignment]]} alt="assignment"></img>
-                            <div>
-                                Rick actively particiates in class and is good at socializing with other students. 
-                                However, he tends to interrupt class oftentimes while other students or I was talking. 
-                                Also, some assignments were not turned in. 
-                            </div>
+                            <div> {selectPerform.aNote == null ? selectPerform.assignment : selectPerform.aNote} </div>
                         </div>
                     </div> }
                 </div>

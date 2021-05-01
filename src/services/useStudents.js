@@ -35,11 +35,24 @@ const useStudents = () => {
         return await response.json();
     }
 
+    async function createOrUpdatePerformance(performance) {
+        const response = await fetch(`http://localhost:8080/students/performances/`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(performance),
+            method: "Post"
+        })
+        return await response.json();
+    }
+
     return useMemo(
         () => ({
             getStudentsByTeacherId,
             getStudentInfoByStudentId,
-            getStudentPerfoByStudentIdandTeacherId
+            getStudentPerfoByStudentIdandTeacherId,
+            createOrUpdatePerformance
         }),
         []
     )

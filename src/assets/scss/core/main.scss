@@ -38,7 +38,7 @@ code {
     
     .panel-header {
         cursor: pointer;
-        color: $main-color;
+        color: $till-pink;
         height: 60px;
         margin: 25%;
     }
@@ -236,18 +236,35 @@ code {
 
     .content {
         height: 700px;
-        width: calc(100% - 80px);
-        padding: 0px 40px;
+        width: calc(100% - 100px);
+        padding: 0px 40px 0px 60px;
         overflow-y: auto;
+
+        .perform-input {
+            min-width: 700px;
+            width: 950px;
+            height: 500px;
+
+            .main-button:active {
+                background-color: $till-pink-shallow;
+            }
+
+            .main-button {
+                cursor: pointer;
+                float: right;
+                background-color: $till-pink;
+                padding-top: 10px;
+                margin-right: 30px;
+            }
+        }
 
         .perform-calendar {
             min-width: 800px;
             height: 220px;
             border: 1px solid black;
-            width: calc(100% - 140px);
+            width: calc(100% - 300px);
             border-radius: 20px;
             padding: 10px 0px 30px 30px;
-            margin-right: 40px;
 
             .row-titles {
                 text-align: left;
@@ -259,7 +276,7 @@ code {
                 }
             }
 
-            .col-data:hover {
+            .select {
                 background-color: #E8F0F2;
                 border-radius: 10px;
                 font-size: 18px;
@@ -303,6 +320,8 @@ code {
                 border-right: 2px solid black;
 
                 .edit {
+                    cursor: pointer;
+                    text-decoration: underline;
                     font-size: 24px;
                 }
             }

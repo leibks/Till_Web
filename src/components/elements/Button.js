@@ -5,12 +5,14 @@ function Button({
     width,
     fontSize,
     text,
-    handleClick
+    handleClick,
+    borderRadius
 }) {
     const customClass = {
         "height": height,
         "width": width,
         "fontSize": fontSize,
+        "borderRadius": borderRadius
     }
 
     return (
