@@ -67,7 +67,7 @@ function StudentView({
     const [selectPerform, setSelectPerform] = useState(null);
     const [inputPerform, setInputPerform] = useState({
         "id": "", "studentId": "", "teacherId": "", "updateDate": "", "participation": "",
-        "behavior": "", "teamwork": "", "assignment": "", "pNote": "", "bNote": "", "tNode": "", "aNode": ""
+        "behavior": "", "teamwork": "", "assignment": "", "pNote": "", "bNote": "", "tNote": "", "aNote": ""
     })
     const [performDate, setPerformDate] = useState(convertDateFormat(new Date()))
     const [isEdit, setIsEdit] = useState(false);
@@ -171,7 +171,7 @@ function StudentView({
         // submit the performance
         try {
             await createOrUpdatePerformance(inputPerform);
-            // alert("create or update performance successfully")
+            alert("create or update performance successfully")
             console.log(inputPerform);
             handleSelectView("studentPerform", "student Performance")
         } catch (exception) {
