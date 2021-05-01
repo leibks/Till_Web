@@ -53,6 +53,13 @@ function InputPerformForm({
     useEffect(() => {
         if (isEdit) {
             setSelectLevel(LEVELDIC[inputType][oldPerform[inputType]]);
+            const nodeKey = inputType.charAt(0) + "Note";
+            if (oldPerform[nodeKey] == null) {
+                setNote(oldPerform[inputType]);
+            } else {
+                setNote(oldPerform[nodeKey]);
+            }
+            
         }
     }, [isEdit, oldPerform, inputType])
 

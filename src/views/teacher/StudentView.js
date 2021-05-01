@@ -49,8 +49,7 @@ const convertDateFormat = (date) => {
     const year = date.getFullYear();
     const month = date.getMonth() < 10 ? "0"+(date.getMonth() + 1).toString() : date.getMonth();
     const day = date.getDate() < 10 ? "0"+date.getDate().toString() : date.getDate();
-    const convertedDate =  `${year}-${month}-${day}`;
-    // console.log( `${year}-${month}-${day}`);
+    const convertedDate = `${year}-${month}-${day}`;
     return convertedDate;
 }
 
@@ -164,14 +163,16 @@ function StudentView({
         for (let type of performanceTypes) {
             if (inputPerform[type] === "") emptyPerform += (type + ",");
         }
-        console.log(inputPerform);
         if (emptyPerform !== "") {
             alert("Please select performances for " + emptyPerform.substring(0, emptyPerform.length - 1));
             return;
         }
+        
+        // submit the performance
         try {
             await createOrUpdatePerformance(inputPerform);
-            alert("create or update performance successfully")
+            // alert("create or update performance successfully")
+            console.log(inputPerform);
             handleSelectView("studentPerform", "student Performance")
         } catch (exception) {
             console.log(exception);
@@ -215,10 +216,12 @@ function StudentView({
     useEffect(() => {
         cleanUpOldData();
         if (!isEdit) {
+            // clean up input performance
             setInputPerform(prevState => {
                 for (let key in prevState)  prevState[key] = "";
                 return prevState;
             })
+            setPerformDate(convertDateFormat(new Date()))
         }
         if (selectStudent) {
             if (selectView === "studentInfo") {
@@ -232,7 +235,6 @@ function StudentView({
                     setIsEdit(false);
                     return;
                 }
-                console.log("remove")
                 // fill the id, studentId, teacherId
                 setInputPerform(prevState => {
                     prevState["studentId"] = selectStudent.id;
