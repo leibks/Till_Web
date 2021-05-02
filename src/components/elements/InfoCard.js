@@ -20,6 +20,6 @@ function InfoCard({
         </div>
     )
 
-} 
+}
 
 export default InfoCard;

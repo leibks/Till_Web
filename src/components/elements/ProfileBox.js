@@ -2,7 +2,7 @@ import React from 'react'
 
 function ProfileBox() {
 
-    retunr ()
+    return (<div></div>)
 }
 
 export default ProfileBox;

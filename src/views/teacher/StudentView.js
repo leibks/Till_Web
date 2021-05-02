@@ -17,7 +17,7 @@ import User from "../../assets/images/icons/user.svg";
 import Users from "../../assets/images/icons/users.svg";
 import InputPerformForm from "../../components/sections/inputPerformForm";
 import Calendar from "../../components/elements/Calendar";
-import {  PERFORMLEVEL, PERFORMTYPES, PERFORMARRAY } from '../../utils/studentPerformanceDic';
+import { PERFORMLEVEL, PERFORMTYPES, PERFORMARRAY } from '../../utils/studentPerformanceDic';
 import { generateMonthName, generateCalendarFormat } from '../../utils/calendarUtil';
 
 const LEVELSYMBOLS = [Exclamation, Triangle, Circle, FiveStar]
@@ -40,7 +40,7 @@ const convertPerforms = (performances) => {
 }
 
 const convertBackPerform = (performance) => {
-    let newPerform = {...performance};
+    let newPerform = { ...performance };
     for (const key of PERFORMTYPES) {
         // convert index to performance content
         newPerform[key] = PERFORMARRAY[key][newPerform[key]];
@@ -86,36 +86,46 @@ function StudentView({
 
     const handleGetFamilyInfo = useCallback(async () => {
         const family = await getFamilyByStudentId(selectStudent.id);
-        const cards = 
-            [{cardName: "Primary Contact",
-              data: [{name: "Full Name", text: family.primaryContactName},
-                     {name: "Relationship to Student", text: family.primaryContactRelation},
-                     {name: "Email", text: family.primaryEmail},
-                     {name: "Phone Number", text: family.primaryPhone}]},
-             {cardName: "Secondary Contact",
-              data: [{name: "Full Name", text: family.secondContactName},
-                     {name: "Relationship to Student", text: family.secondContactRelation},
-                     {name: "Email", text: family.secondEmail},
-                     {name: "Phone Number", text: family.secondPhone}]}];
+        const cards =
+            [{
+                cardName: "Primary Contact",
+                data: [{ name: "Full Name", text: family.primaryContactName },
+                { name: "Relationship to Student", text: family.primaryContactRelation },
+                { name: "Email", text: family.primaryEmail },
+                { name: "Phone Number", text: family.primaryPhone }]
+            },
+            {
+                cardName: "Secondary Contact",
+                data: [{ name: "Full Name", text: family.secondContactName },
+                { name: "Relationship to Student", text: family.secondContactRelation },
+                { name: "Email", text: family.secondEmail },
+                { name: "Phone Number", text: family.secondPhone }]
+            }];
         setCardContents(cards);
     }, [getFamilyByStudentId, selectStudent]);
 
     const handleGetStudentInfo = useCallback(async () => {
         const studentInfo = await getStudentInfoByStudentId(selectStudent.id);
-        const cards = 
-            [{cardName: "Basic Information", 
-              data: [{name: "Full Name", text: selectStudent.firstName + " " + selectStudent.middleName + " " + selectStudent.lastName},
-                     {name: "Date of Birth", text: studentInfo.dateOfBirth},
-                     {name: "Language", text: studentInfo.firstLanguage + "," + studentInfo.homeLanguage}]},
-              {cardName: "Health Details",
-               data: [{name: "Allergies", text: "n/a"},
-                      {name: "Health Conditions", text: studentInfo.healthDetails},
-                      {name: "Behaviral Health", text: studentInfo.additionalInfo}]},
-              {cardName: "Additional Notes",
-               data: [{name: "Content", text: studentInfo.additionalInfo}]}]
+        const cards =
+            [{
+                cardName: "Basic Information",
+                data: [{ name: "Full Name", text: selectStudent.firstName + " " + selectStudent.middleName + " " + selectStudent.lastName },
+                { name: "Date of Birth", text: studentInfo.dateOfBirth },
+                { name: "Language", text: studentInfo.firstLanguage + "," + studentInfo.homeLanguage }]
+            },
+            {
+                cardName: "Health Details",
+                data: [{ name: "Allergies", text: "n/a" },
+                { name: "Health Conditions", text: studentInfo.healthDetails },
+                { name: "Behaviral Health", text: studentInfo.additionalInfo }]
+            },
+            {
+                cardName: "Additional Notes",
+                data: [{ name: "Content", text: studentInfo.additionalInfo }]
+            }]
         setCardContents(cards);
     }, [getStudentInfoByStudentId, selectStudent]);
-    
+
     const handleSwitchView = useCallback((type, header) => {
         setSelectView(type);
         setViewHeader(header);
@@ -130,7 +140,7 @@ function StudentView({
         // check empty performance
         let emptyPerform = "";
         for (let type of PERFORMTYPES) {
-            if (inputPerform[type] === -1 || inputPerform[type] === undefined ||  inputPerform[type] === "") emptyPerform += (type + ",");
+            if (inputPerform[type] === -1 || inputPerform[type] === undefined || inputPerform[type] === "") emptyPerform += (type + ",");
         }
         if (emptyPerform !== "") {
             alert("Please select performances for " + emptyPerform.substring(0, emptyPerform.length - 1));
@@ -177,7 +187,7 @@ function StudentView({
         if (!isEdit) {
             // clean up input performance
             setInputPerform(prevState => {
-                for (let key in prevState)  prevState[key] = "";
+                for (let key in prevState) prevState[key] = "";
                 return prevState;
             })
         }
@@ -202,7 +212,7 @@ function StudentView({
                 })
             }
         }
-    }, [teacherId, selectStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, 
+    }, [teacherId, selectStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo,
         handGetStudentPerformance, cleanUpOldData]);
 
     return (
@@ -214,121 +224,121 @@ function StudentView({
                 <div className="list-header"> Students </div>
                 {students.map((student) => {
                     return (<UserNav
-                                key={student.id} customStyles="custom-user-nav" user={student}
-                                userId={student.id} userType="student"
-                                isSelect={selectStudent && student.id === selectStudent.id} 
-                                setSelectFunction={setSelectStudent}>
-                            </UserNav>)
+                        key={student.id} customStyles="custom-user-nav" user={student}
+                        userId={student.id} userType="student"
+                        isSelect={selectStudent && student.id === selectStudent.id}
+                        setSelectFunction={setSelectStudent}>
+                    </UserNav>)
                 })}
             </div>
             {/* main view */}
             {selectStudent &&
-            <div className="view-content">
-                {/* main view header */}
-                <div className="content-header">
-                    <div className="user-nav custom-user-nav disable-hover">
-                        <img 
-                            className="user-img" alt={selectStudent.id} 
-                            src={selectStudent.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
-                        </img>
-                        <div className="user-name">
-                            <div>{selectStudent.firstName} {selectStudent.middleName} {selectStudent.lastName}</div>
-                            <span>ID: {selectStudent.id} </span>
+                <div className="view-content">
+                    {/* main view header */}
+                    <div className="content-header">
+                        <div className="user-nav custom-user-nav disable-hover">
+                            <img
+                                className="user-img" alt={selectStudent.id}
+                                src={selectStudent.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
+                            </img>
+                            <div className="user-name">
+                                <div>{selectStudent.firstName} {selectStudent.middleName} {selectStudent.lastName}</div>
+                                <span>ID: {selectStudent.id} </span>
+                            </div>
+                        </div>
+                        <div className="button" >
+                            <Button
+                                text="Input Peformance" height="35px"
+                                handleClick={(e) => handleSwitchView("inputPerform", "Input Performance")}
+                                width="250px" borderRadius="20px" fontSize="18px">
+                            </Button>
                         </div>
                     </div>
-                    <div className="button" >
-                        <Button
-                            text="Input Peformance" height="35px" 
-                            handleClick={(e) => handleSwitchView("inputPerform", "Input Performance")} 
-                            width="250px" borderRadius="20px" fontSize="18px">
-                        </Button>
+                    {/* main view switch bars */}
+                    <div className="nav-switch-bars">
+                        <div
+                            onClick={() => handleSwitchView("studentPerform", "Student Performance")}
+                            className={`switch-bar ${selectView === "studentPerform" ? "select" : ""}`}>
+                            <div className="inner"> <img src={Edit} alt="edit"></img> Student Performance </div>
+                        </div>
+                        <div
+                            onClick={() => handleSwitchView("studentInfo", "Student Information")}
+                            className={`switch-bar ${selectView === "studentInfo" ? "select" : ""}`} id="studentInfo">
+                            <div className="inner"> <img src={User} alt="user"></img> Student Information </div>
+                        </div>
+                        <div
+                            onClick={() => handleSwitchView("familyInfo", "Family Information")}
+                            className={`switch-bar ${selectView === "familyInfo" ? "select" : ""}`} id="familyInfo">
+                            <div className="inner"> <img src={Users} alt="users"></img> Family Information </div>
+                        </div>
                     </div>
-                </div>
-                {/* main view switch bars */}
-                <div className="nav-switch-bars">
-                    <div 
-                        onClick={() => handleSwitchView("studentPerform", "Student Performance")}
-                        className={`switch-bar ${selectView === "studentPerform" ? "select" : ""}`}>
-                        <div className="inner"> <img src={Edit} alt="edit"></img> Student Performance </div>
+                    {/* main view content */}
+                    <div className="content">
+                        <h1>{viewHeader}</h1>
+                        {/* main view content: input performance page */}
+                        {selectView === "inputPerform" &&
+                            <div className="perform-input">
+                                <Button
+                                    text="Submit" height="40px" handleClick={() => handleSubmitPerformance()}
+                                    width="240px" borderRadius="30px" fontSize="20px">
+                                </Button>
+                                <Calendar inputPerform={inputPerform} setInputPerform={setInputPerform}></Calendar>
+                                {PERFORMTYPES.map(
+                                    text => <InputPerformForm key={text} inputType={text} inputPerform={inputPerform}
+                                        setInputPerform={setInputPerform} ></InputPerformForm>
+                                )}
+                            </div>}
+                        {/* main view content: student and family information page */}
+                        {(selectView === "studentInfo" || selectView === "familyInfo") &&
+                            cardContents.map(card => <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data}></InfoCard>)}
+                        {/* main view content: student performances page - performance calendar */}
+                        {selectView === "studentPerform" &&
+                            <div className="perform-calendar">
+                                <div className="row-titles">
+                                    {["Participation", "Behavior", "Teamwork", "Assignment"].map(
+                                        text => <div key={text} className="row-title"> {text} </div>)}
+                                </div>
+                                {performances.map((col, idx) => {
+                                    return (
+                                        <div key={idx} className={`col-data ${selectPerform && (selectPerform.id === col.id) ? "select" : ""}`}
+                                            onClick={(e) => setSelectPerform(col)}>
+                                            <div>{generateMonthName(col.updateDate)}</div>
+                                            {PERFORMTYPES.map(text => <img key={text} src={LEVELSYMBOLS[col[text]]} alt={text}></img>)}
+                                        </div>)
+                                })}
+                            </div>}
+                        {/* main view content: student performances page - selected performance detail */}
+                        {selectPerform &&
+                            <div className="perform-detail">
+                                <div className="date-title">
+                                    {generateMonthName(selectPerform.updateDate)}
+                                    <div onClick={handleEditPerform} className="edit"> edit </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="title">Participation</div>
+                                    <img src={LEVELSYMBOLS[selectPerform.participation]} alt="partipate"></img>
+                                    <div> {selectPerform.pNote} </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="title">Behavior</div>
+                                    <img src={LEVELSYMBOLS[selectPerform.behavior]} alt="behavior"></img>
+                                    <div> {selectPerform.bNote} </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="title">Teamwork</div>
+                                    <img src={LEVELSYMBOLS[selectPerform.teamwork]} alt="teamwork"></img>
+                                    <div> {selectPerform.tNote} </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="title">Assignment</div>
+                                    <img src={LEVELSYMBOLS[selectPerform.assignment]} alt="assignment"></img>
+                                    <div> {selectPerform.aNote} </div>
+                                </div>
+                            </div>}
                     </div>
-                    <div 
-                        onClick={() => handleSwitchView("studentInfo", "Student Information")}
-                        className={`switch-bar ${selectView === "studentInfo" ? "select" : ""}`} id="studentInfo">
-                        <div className="inner"> <img src={User} alt="user"></img> Student Information </div>
-                    </div>
-                    <div 
-                        onClick={() => handleSwitchView("familyInfo", "Family Information")}
-                        className={`switch-bar ${selectView === "familyInfo" ? "select" : ""}`} id="familyInfo"> 
-                        <div className="inner"> <img src={Users} alt="users"></img> Family Information </div>
-                    </div>
-                </div>
-                {/* main view content */}
-                <div className="content">
-                    <h1>{viewHeader}</h1>
-                    {/* main view content: input performance page */}
-                    {selectView === "inputPerform" && 
-                    <div className="perform-input">
-                        <Button 
-                            text="Submit" height="40px" handleClick={() => handleSubmitPerformance()}
-                            width="240px" borderRadius="30px" fontSize="20px">
-                        </Button>
-                        <Calendar inputPerform={inputPerform} setInputPerform={setInputPerform}></Calendar>
-                        {PERFORMTYPES.map(
-                            text => <InputPerformForm key={text} inputType={text} inputPerform={inputPerform} 
-                            setInputPerform={setInputPerform} ></InputPerformForm>
-                        )}
-                    </div>}
-                    {/* main view content: student and family information page */}
-                    {(selectView === "studentInfo" || selectView === "familyInfo") &&
-                    cardContents.map(card => <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data}></InfoCard>)}
-                    {/* main view content: student performances page - performance calendar */}
-                    {selectView === "studentPerform" && 
-                    <div className="perform-calendar">
-                        <div className="row-titles">
-                            {["Participation", "Behavior", "Teamwork", "Assignment"].map(
-                                text => <div key={text} className="row-title"> {text} </div>)}
-                        </div>
-                        {performances.map((col, idx) => {
-                            return (
-                            <div key={idx} className={`col-data ${selectPerform && (selectPerform.id === col.id) ? "select" : ""}`} 
-                                onClick={(e) => setSelectPerform(col)}>
-                                <div>{generateMonthName(col.updateDate)}</div>
-                                {PERFORMTYPES.map(text => <img key={text} src={LEVELSYMBOLS[col[text]]} alt={text}></img>)}
-                            </div>)
-                        })}
-                    </div>}
-                    {/* main view content: student performances page - selected performance detail */}
-                    {selectPerform &&
-                    <div className="perform-detail">
-                        <div className="date-title">
-                            {generateMonthName(selectPerform.updateDate)}
-                            <div onClick={handleEditPerform} className="edit"> edit </div> 
-                        </div>
-                        <div className="detail-item"> 
-                            <div className="title">Participation</div> 
-                            <img src={LEVELSYMBOLS[selectPerform.participation]} alt="partipate"></img>
-                            <div> {selectPerform.pNote } </div>
-                        </div>
-                        <div className="detail-item"> 
-                            <div className="title">Behavior</div> 
-                            <img src={LEVELSYMBOLS[selectPerform.behavior]} alt="behavior"></img>
-                            <div> {selectPerform.bNote } </div>
-                        </div>
-                        <div className="detail-item"> 
-                            <div className="title">Teamwork</div> 
-                            <img src={LEVELSYMBOLS[selectPerform.teamwork]} alt="teamwork"></img>
-                            <div> {selectPerform.tNote } </div>
-                        </div>
-                        <div className="detail-item">
-                            <div className="title">Assignment</div> 
-                            <img src={LEVELSYMBOLS[selectPerform.assignment]} alt="assignment"></img>
-                            <div> {selectPerform.aNote } </div>
-                        </div>
-                    </div> }
-                </div>
-            </div>}
+                </div>}
             {selectStudent == null &&
-            <div className="blank-content">Click on a Student Profile</div>}
+                <div className="blank-content">Click on a Student Profile</div>}
         </div>
     )
 }

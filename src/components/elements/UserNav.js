@@ -12,18 +12,18 @@ function UserNav({
 }) {
 
     return (
-        <div 
+        <div
             className={`user-nav ${customStyles}  ${isSelect ? "select-item" : ""}`}
             onClick={(e) => setSelectFunction(user)}
         >
             <div className={`user-img`}>
-                <img 
-                    alt={userId} 
+                <img
+                    alt={userId}
                     src={user.gender === "MALE" ? BoyProfileSample : GirlProfileSample}>
                 </img>
             </div>
-            <div className="user-name"> 
-                {user.firstName} {user.lastName} 
+            <div className="user-name">
+                {user.firstName} {user.lastName}
             </div>
         </div>
     )

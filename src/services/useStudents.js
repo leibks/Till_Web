@@ -4,7 +4,7 @@ import { useMemo } from "react";
 const useStudents = () => {
     async function getStudentsByTeacherId(teacherId) {
         const response = await fetch(`http://localhost:8080/students/?teacherId=${teacherId}`, {
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
@@ -15,7 +15,7 @@ const useStudents = () => {
 
     async function getStudentInfoByStudentId(studentId) {
         const response = await fetch(`http://localhost:8080/students/info/?studentId=${studentId}`, {
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
