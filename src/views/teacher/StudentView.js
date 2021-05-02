@@ -187,8 +187,9 @@ function StudentView({
         if (!isEdit) {
             // clean up input performance
             setInputPerform(prevState => {
-                for (let key in prevState) prevState[key] = "";
-                return prevState;
+                const newState = { ...prevState }
+                for (let key in newState) newState[key] = "";
+                return newState;
             })
         }
         if (selectStudent) {
@@ -205,10 +206,11 @@ function StudentView({
                 }
                 // fill the studentId, teacherId and default date
                 setInputPerform(prevState => {
-                    prevState["studentId"] = selectStudent.id;
-                    prevState["teacherId"] = teacherId;
-                    prevState["updateDate"] = generateCalendarFormat(new Date());
-                    return prevState;
+                    const newState = { ...prevState };
+                    newState["studentId"] = selectStudent.id;
+                    newState["teacherId"] = teacherId;
+                    newState["updateDate"] = generateCalendarFormat(new Date());
+                    return newState;
                 })
             }
         }

@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from '@material-ui/core/TextField';
-import { generateCalendarFormat } from '../../utils/calendarUtil';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -15,34 +14,21 @@ function Calendar({
     setInputPerform
 }) {
     const classes = useStyles();
-    const [date, setDate] = useState("");
 
-    useEffect(() => {
-        if (inputPerform["updateDate"] === "") {
-            setDate(generateCalendarFormat(new Date()));
-        } else {
-            setDate(inputPerform["updateDate"]);
-        }
-    }, [inputPerform])
-
-    // watcher (monitor the change of date in calendar)
-    useEffect(() => {
+    const handleDateChange = useCallback((date) => {
         setInputPerform(prevState => {
-            prevState["updateDate"] = date
-            return prevState;
+            const newState = { ...prevState };
+            newState["updateDate"] = date
+            return newState;
         })
-    }, [date, setInputPerform])
-
-    const handleDateChange = useCallback((event) => {
-        setDate(event.target.value);
-    }, [])
+    }, [setInputPerform])
 
     return (
         <div className="calendar">
             <form className={classes.container} noValidate>
                 <TextField
                     id="date" label="Date Picker" type="date"
-                    onChange={handleDateChange} value={date}
+                    onChange={(e) => handleDateChange(e.target.value)} value={inputPerform["updateDate"]}
                     className={classes.textField} InputLabelProps={{ shrink: true }}
                 />
             </form>
