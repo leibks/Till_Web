@@ -18,15 +18,9 @@ import Edit from "../../assets/images/icons/edit.svg";
 import User from "../../assets/images/icons/user.svg";
 import Users from "../../assets/images/icons/users.svg";
 import InputPerformForm from "../../components/sections/inputPerformForm";
+import {  PERFORMLEVEL, PERFORMTYPES, PERFORMARRAY} from '../../utils/studentPerformanceDic';
 
-const PERFORMLEVELS = [Exclamation, Triangle, Circle, FiveStar]
-const performanceTypes = ["participation", "behavior", "teamwork", "assignment"]
-const LEVELDIC = {
-    participation: { "needs more participation": 0, "somewhat participating": 1, "actively participating": 2, "excellent": 3},
-    behavior: { "interrupts class": 0, "often distracted": 1, "socializes with friends well": 2, "follows rules well": 3},
-    teamwork: { "disruptive or irresponsive": 0, "reserved": 1, "working well with others": 2, "showing leadership": 3},
-    assignment: { "turns in none/little": 0, "turns in some assignments": 1, "turns in most assignments": 2, "turns in all assignments": 3}
-}
+const LEVELSYMBOLS = [Exclamation, Triangle, Circle, FiveStar]
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -40,17 +34,47 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const convertDate = (date) => {
-    const curDate = new Date(date);
+// given date string yyyy-mm-dd, return month name + date (dd)
+const generateMonthName = (date) => {
+    const curDate = new Date(date.replaceAll("-", "/"));
     return curDate.toLocaleString('default', { month: 'long',  day: 'numeric'});
 }
 
-const convertDateFormat = (date) => {
+// given new Date() type, return yyyy-mm-dd
+const generateCalendarFormat = (date) => {
     const year = date.getFullYear();
     const month = date.getMonth() < 10 ? "0"+(date.getMonth() + 1).toString() : date.getMonth();
     const day = date.getDate() < 10 ? "0"+date.getDate().toString() : date.getDate();
     const convertedDate = `${year}-${month}-${day}`;
     return convertedDate;
+}
+
+const convertPerforms = (performances) => {
+    for (let i = 0; i < performances.length; i++) {
+        for (const key of PERFORMTYPES) {
+            // convert notes to default if null
+            const noteKey = key.charAt(0) + "Note";
+            if (performances[i][noteKey] === null) {
+                performances[i][noteKey] = performances[i][key];
+            }
+            // convert performance level to index
+            performances[i][key] = PERFORMLEVEL[key][performances[i][key]];
+        }
+        // convert calendar
+        performances[i]["updateDate"] = performances[i]["updateDate"].replaceAll("/", "-");
+    }
+    return performances;
+}
+
+const convertBackPerform = (performance) => {
+    let newPerform = {...performance};
+    for (const key of PERFORMTYPES) {
+        // convert index to performance content
+        newPerform[key] = PERFORMARRAY[key][newPerform[key]];
+    }
+    // convert calendar
+    newPerform["updateDate"] = newPerform["updateDate"].replaceAll("-", "/");
+    return newPerform;
 }
 
 function StudentView({
@@ -69,7 +93,7 @@ function StudentView({
         "id": "", "studentId": "", "teacherId": "", "updateDate": "", "participation": "",
         "behavior": "", "teamwork": "", "assignment": "", "pNote": "", "bNote": "", "tNote": "", "aNote": ""
     })
-    const [performDate, setPerformDate] = useState(convertDateFormat(new Date()))
+    const [inputDate, setInputDate] = useState("");
     const [isEdit, setIsEdit] = useState(false);
 
     const { getStudentsByTeacherId, getStudentInfoByStudentId,
@@ -85,6 +109,7 @@ function StudentView({
 
     const handGetStudentPerformance = useCallback(async () => {
         const performanceList = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectStudent.id);
+        convertPerforms(performanceList);
         setPerformances(performanceList);
     }, [teacherId, selectStudent, getStudentPerfoByStudentIdandTeacherId])
 
@@ -150,7 +175,7 @@ function StudentView({
     const handleSubmitPerformance = useCallback(async (e) => {
         // setId
         setInputPerform(prevState => {
-            prevState["id"] = teacherId + "+" + selectStudent.id + "+" + prevState["updateDate"];
+            prevState["id"] = teacherId + "+" + selectStudent.id + "+" + prevState["updateDate"].replaceAll("-", "/");
             return prevState;
         })
         // check valid date
@@ -160,38 +185,38 @@ function StudentView({
         }
         // check empty performance
         let emptyPerform = "";
-        for (let type of performanceTypes) {
-            if (inputPerform[type] === "") emptyPerform += (type + ",");
+        for (let type of PERFORMTYPES) {
+            if (inputPerform[type] === -1) emptyPerform += (type + ",");
         }
         if (emptyPerform !== "") {
             alert("Please select performances for " + emptyPerform.substring(0, emptyPerform.length - 1));
             return;
         }
-        
         // submit the performance
         try {
-            await createOrUpdatePerformance(inputPerform);
+            const newPerform = convertBackPerform(inputPerform);
+            await createOrUpdatePerformance(newPerform);
             alert("create or update performance successfully")
-            console.log(inputPerform);
             handleSelectView("studentPerform", "student Performance")
         } catch (exception) {
             console.log(exception);
         }
     }, [inputPerform, teacherId, selectStudent, createOrUpdatePerformance, handleSelectView]);
 
-    const handleDateChange = useCallback((date) => {
-        setPerformDate(date.target.value);
-        const updateDate =  date.target.value.replaceAll('-', '/');
+    useEffect(() => {
         setInputPerform(prevState => {
-            prevState["updateDate"] = updateDate
-            prevState["id"] = teacherId + "+" + selectStudent.id + "+" + updateDate;
+            prevState["updateDate"] = inputDate
             return prevState;
         })
-    }, [teacherId, selectStudent]);
+    }, [inputDate])
+
+    const handleDateChange = useCallback((date) => {
+        setInputDate(date.target.value);
+    }, []);
 
     const handleEditPerform = useCallback(() => {
         setInputPerform(selectPerform);
-        setPerformDate(selectPerform.updateDate.replaceAll("/", "-"));
+        setInputDate(selectPerform.updateDate);
         setIsEdit(true);
         handleSelectView("inputPerform", "Input Performance")
     }, [handleSelectView, selectPerform, setIsEdit])
@@ -221,7 +246,6 @@ function StudentView({
                 for (let key in prevState)  prevState[key] = "";
                 return prevState;
             })
-            setPerformDate(convertDateFormat(new Date()))
         }
         if (selectStudent) {
             if (selectView === "studentInfo") {
@@ -239,7 +263,11 @@ function StudentView({
                 setInputPerform(prevState => {
                     prevState["studentId"] = selectStudent.id;
                     prevState["teacherId"] = teacherId;
-                    prevState["updateDate"] = convertDateFormat(new Date());
+                    prevState["updateDate"] = generateCalendarFormat(new Date());
+                    setInputDate(generateCalendarFormat(new Date()));
+                    for (const key of PERFORMTYPES) {
+                        prevState[key] = -1;
+                    }
                     return prevState;
                 })
             }
@@ -321,7 +349,7 @@ function StudentView({
                                     label="Performance Date Picker"
                                     type="date"
                                     onChange={handleDateChange}
-                                    value={performDate}
+                                    value={inputDate}
                                     className={classes.textField}
                                     InputLabelProps={{
                                         shrink: true,
@@ -330,7 +358,7 @@ function StudentView({
                             </form>
                         </div>
                         {["participation", "behavior", "teamwork", "assignment"].map(
-                            text => <InputPerformForm key={text} inputType={text} isEdit={isEdit} oldPerform={selectPerform}
+                            text => <InputPerformForm key={text} inputType={text} inputPerform={inputPerform} 
                             setInputPerform={setInputPerform} ></InputPerformForm>
                         )}
                     </div>}
@@ -347,9 +375,9 @@ function StudentView({
                             return (
                             <div key={idx} className={`col-data ${selectPerform && (selectPerform.id === col.id) ? "select" : ""}`} 
                                 onClick={(e) => setSelectPerform(col)}>
-                                <div>{convertDate(col.updateDate)}</div>
-                                {performanceTypes.map(
-                                    text => <img key={text} src={PERFORMLEVELS[LEVELDIC[text][col[text]]]} alt={text}></img>
+                                <div>{generateMonthName(col.updateDate)}</div>
+                                {PERFORMTYPES.map(
+                                    text => <img key={text} src={LEVELSYMBOLS[col[text]]} alt={text}></img>
                                 )}
                             </div>)
                         })}
@@ -357,28 +385,28 @@ function StudentView({
                     {selectPerform &&
                     <div className="perform-detail">
                         <div className="date-title"> 
-                            {convertDate(selectPerform.updateDate)}
+                            {generateMonthName(selectPerform.updateDate)}
                             <div onClick={handleEditPerform} className="edit"> edit </div> 
                         </div>
                         <div className="detail-item"> 
                             <div className="title">Participation</div> 
-                            <img src={PERFORMLEVELS[LEVELDIC["participation"][selectPerform.participation]]} alt="partipate"></img>
-                            <div> {selectPerform.pNote == null ? selectPerform.participation : selectPerform.pNote} </div>
+                            <img src={LEVELSYMBOLS[selectPerform.participation]} alt="partipate"></img>
+                            <div> {selectPerform.pNote } </div>
                         </div>
                         <div className="detail-item"> 
                             <div className="title">Behavior</div> 
-                            <img src={PERFORMLEVELS[LEVELDIC["behavior"][selectPerform.behavior]]} alt="behavior"></img>
-                            <div> {selectPerform.bNote == null ? selectPerform.behavior : selectPerform.bNote} </div>
+                            <img src={LEVELSYMBOLS[selectPerform.behavior]} alt="behavior"></img>
+                            <div> {selectPerform.bNote } </div>
                         </div>
                         <div className="detail-item"> 
                             <div className="title">Teamwork</div> 
-                            <img src={PERFORMLEVELS[LEVELDIC["teamwork"][selectPerform.teamwork]]} alt="teamwork"></img>
-                            <div> {selectPerform.tNote == null ? selectPerform.teamwork : selectPerform.tNote} </div>
+                            <img src={LEVELSYMBOLS[selectPerform.teamwork]} alt="teamwork"></img>
+                            <div> {selectPerform.tNote } </div>
                         </div>
                         <div className="detail-item">
                             <div className="title">Assignment</div> 
-                            <img src={PERFORMLEVELS[LEVELDIC["assignment"][selectPerform.assignment]]} alt="assignment"></img>
-                            <div> {selectPerform.aNote == null ? selectPerform.assignment : selectPerform.aNote} </div>
+                            <img src={LEVELSYMBOLS[selectPerform.assignment]} alt="assignment"></img>
+                            <div> {selectPerform.aNote } </div>
                         </div>
                     </div> }
                 </div>
