@@ -140,7 +140,7 @@ function StudentView({
         // check empty performance
         let emptyPerform = "";
         for (let type of PERFORMTYPES) {
-            if (inputPerform[type] === -1 || inputPerform[type] === undefined || inputPerform[type] === "") emptyPerform += (type + ",");
+            if (inputPerform[type] === -1) emptyPerform += (type + ",");
         }
         if (emptyPerform !== "") {
             alert("Please select performances for " + emptyPerform.substring(0, emptyPerform.length - 1));
@@ -210,6 +210,9 @@ function StudentView({
                     newState["studentId"] = selectStudent.id;
                     newState["teacherId"] = teacherId;
                     newState["updateDate"] = generateCalendarFormat(new Date());
+                    for (const key of PERFORMTYPES) {
+                        newState[key] = -1;
+                    }
                     return newState;
                 })
             }
