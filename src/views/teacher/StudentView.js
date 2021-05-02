@@ -72,7 +72,7 @@ const convertBackPerform = (performance) => {
         // convert index to performance content
         newPerform[key] = PERFORMARRAY[key][newPerform[key]];
     }
-    // convert calendar
+    // convert date from yyyy-mm-dd to yyyy/mm/dd
     newPerform["updateDate"] = newPerform["updateDate"].replaceAll("-", "/");
     return newPerform;
 }
@@ -173,11 +173,6 @@ function StudentView({
     }, []);
 
     const handleSubmitPerformance = useCallback(async (e) => {
-        // setId
-        setInputPerform(prevState => {
-            prevState["id"] = teacherId + "+" + selectStudent.id + "+" + prevState["updateDate"].replaceAll("-", "/");
-            return prevState;
-        })
         // check valid date
         if (new Date(inputPerform["updateDate"]).getTime() > new Date().getTime()) {
             alert("Please do not select future date")
@@ -186,15 +181,18 @@ function StudentView({
         // check empty performance
         let emptyPerform = "";
         for (let type of PERFORMTYPES) {
-            if (inputPerform[type] === -1) emptyPerform += (type + ",");
+            if (inputPerform[type] === -1 || inputPerform[type] === undefined ||  inputPerform[type] === "") emptyPerform += (type + ",");
         }
         if (emptyPerform !== "") {
             alert("Please select performances for " + emptyPerform.substring(0, emptyPerform.length - 1));
             return;
         }
+        
         // submit the performance
         try {
             const newPerform = convertBackPerform(inputPerform);
+            // set id
+            newPerform["id"] = teacherId + "+" + selectStudent.id + "+" + newPerform["updateDate"];
             await createOrUpdatePerformance(newPerform);
             alert("create or update performance successfully")
             handleSelectView("studentPerform", "student Performance")
@@ -202,13 +200,6 @@ function StudentView({
             console.log(exception);
         }
     }, [inputPerform, teacherId, selectStudent, createOrUpdatePerformance, handleSelectView]);
-
-    useEffect(() => {
-        setInputPerform(prevState => {
-            prevState["updateDate"] = inputDate
-            return prevState;
-        })
-    }, [inputDate])
 
     const handleDateChange = useCallback((date) => {
         setInputDate(date.target.value);
@@ -231,13 +222,14 @@ function StudentView({
     // on mount function
     useEffect(() => {
         if (teacherId) {
-            handleGetStudentsByTeacherId()
+            handleGetStudentsByTeacherId();
+            // set default view to student information page
             setSelectView("studentInfo");
             setViewHeader("Student Information");
         }
     }, [teacherId, handleGetStudentsByTeacherId]);
 
-    // when switch view
+    // watcher (monitor the chaneg of selected student and view page)
     useEffect(() => {
         cleanUpOldData();
         if (!isEdit) {
@@ -265,9 +257,6 @@ function StudentView({
                     prevState["teacherId"] = teacherId;
                     prevState["updateDate"] = generateCalendarFormat(new Date());
                     setInputDate(generateCalendarFormat(new Date()));
-                    for (const key of PERFORMTYPES) {
-                        prevState[key] = -1;
-                    }
                     return prevState;
                 })
             }
@@ -275,28 +264,33 @@ function StudentView({
     }, [teacherId, selectStudent, selectView, handleGetStudentInfo, handleGetFamilyInfo, 
         handGetStudentPerformance, cleanUpOldData]);
 
+    // watcher (monitor the chaneg of inputDate in calendar)
+    useEffect(() => {
+        setInputPerform(prevState => {
+            prevState["updateDate"] = inputDate
+            return prevState;
+        })
+    }, [inputDate])
+
     return (
         <div className="main-view-content">
             <div className="profile-box"> <img alt="teacher-profile" src={TeacherProfileSample}></img> </div>
             <ContentHeader headerName="Student View" />
+            {/* student list menu*/}
             <div className="users-list">
                 <div className="list-header"> Students </div>
                 {students.map((student) => {
-                    return (
-                        <UserNav
-                            key={student.id}
-                            customStyles="custom-user-nav"
-                            user={student}
-                            userId={student.id}
-                            userType="student"
-                            isSelect={selectStudent && student.id === selectStudent.id}
-                            setSelectFunction={setSelectStudent}
-                        />
-                    )
+                    return (<UserNav
+                                key={student.id} customStyles="custom-user-nav" user={student}
+                                userId={student.id} userType="student"
+                                isSelect={selectStudent && student.id === selectStudent.id} 
+                                setSelectFunction={setSelectStudent}/>)
                 })}
             </div>
+            {/* main view */}
             {selectStudent &&
             <div className="view-content">
+                {/* main view header */}
                 <div className="content-header">
                     <div className="user-nav custom-user-nav disable-hover">
                         <img 
@@ -316,6 +310,7 @@ function StudentView({
                         </Button>
                     </div>
                 </div>
+                {/* main view switch bars */}
                 <div className="nav-switch-bars">
                     <div 
                         onClick={() => handleSelectView("studentPerform", "Student Performance")}
@@ -333,8 +328,10 @@ function StudentView({
                         <div className="inner"> <img src={Users} alt="users"></img> Family Information </div>
                     </div>
                 </div>
+                {/* main view content */}
                 <div className="content">
                     <h1>{viewHeader}</h1>
+                    {/* main view content: input performance page */}
                     {selectView === "inputPerform" && 
                     <div className="perform-input">
                         <Button 
@@ -345,25 +342,21 @@ function StudentView({
                         <div className="calendar">
                             <form className={classes.container} noValidate>
                                 <TextField
-                                    id="date"
-                                    label="Performance Date Picker"
-                                    type="date"
-                                    onChange={handleDateChange}
-                                    value={inputDate}
-                                    className={classes.textField}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
+                                    id="date" label="Performance Date Picker" type="date"
+                                    onChange={handleDateChange} value={inputDate}
+                                    className={classes.textField} InputLabelProps={{ shrink: true }}
                                 />
                             </form>
                         </div>
-                        {["participation", "behavior", "teamwork", "assignment"].map(
+                        {PERFORMTYPES.map(
                             text => <InputPerformForm key={text} inputType={text} inputPerform={inputPerform} 
                             setInputPerform={setInputPerform} ></InputPerformForm>
                         )}
                     </div>}
+                    {/* main view content: student and family information page */}
                     {(selectView === "studentInfo" || selectView === "familyInfo") &&
                     cardContents.map(card => <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data}></InfoCard>)}
+                    {/* main view content: student performances page - performance calendar */}
                     {selectView === "studentPerform" && 
                     <div className="perform-calendar">
                         <div className="row-titles">
@@ -382,6 +375,7 @@ function StudentView({
                             </div>)
                         })}
                     </div>}
+                    {/* main view content: student performances page - selected performance detail */}
                     {selectPerform &&
                     <div className="perform-detail">
                         <div className="date-title"> 

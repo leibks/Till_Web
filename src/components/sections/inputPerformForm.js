@@ -79,6 +79,7 @@ function InputPerformForm({
         </div>}
         {!isCollapse && 
         <TextField
+            placeholder="Enter note here (optional)"
             className={classes.textArea}
             id="outlined-multiline-static"
             multiline
