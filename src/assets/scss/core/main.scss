@@ -215,6 +215,14 @@ code {
         .single-message {
             margin: 20px 0px 20px 0px;
         }
+
+        .edit {
+            margin-top: 18px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 20px;
+        }
     }
     // dashboard view end
 }
@@ -326,12 +334,6 @@ code {
         .disable-hover {
             pointer-events: none;
         }
-
-        .button {
-            float: right;
-            cursor: pointer;
-            margin-top: 5px;
-        }
     }
     
     .nav-switch-bars {
@@ -393,11 +395,21 @@ code {
             }
 
             .main-button {
-                cursor: pointer;
                 float: right;
                 background-color: $till-pink;
                 padding-top: 10px;
                 margin-right: 30px;
+            }
+        }
+
+        .input-perform-button {
+            .main-button:active {
+                background-color: $main-button-color-shallow;
+            }
+            .main-button {
+                padding-top: 10px;
+                margin-top: -60px;
+                float: right;
             }
         }
 

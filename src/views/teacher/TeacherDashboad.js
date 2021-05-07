@@ -94,6 +94,7 @@ function TeacherDashboad({
                         </div>
                     </div>)
                 })}
+                <div className="edit"> View More </div>
             </div>
 
         </div>

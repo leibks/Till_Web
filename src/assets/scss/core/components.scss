@@ -10,12 +10,21 @@
 }
 
 .main-button {
+    cursor: pointer;
     width: 100%;
     height: 100%;
     text-align: center;
     padding-top: 5px;
     background-color: $main-button-color;
     color: $main-button-text-color;
+}
+
+.chatbox {
+    cursor: pointer;
+    position: fixed;
+    z-index: 100;
+    right: 50px;
+    bottom: 30px;
 }
 
 .user-nav {

@@ -15,6 +15,7 @@ import User from "../../assets/images/icons/user.svg";
 import Users from "../../assets/images/icons/users.svg";
 import InputPerformForm from "../../components/sections/inputPerformForm";
 import Calendar from "../../components/elements/Calendar";
+import ChatBox from "../../assets/images/chatbox.svg"
 import { PERFORMLEVEL, PERFORMTYPES, PERFORMARRAY } from '../../utils/studentPerformanceDic';
 import { generateMonthName, generateCalendarFormat } from '../../utils/calendarUtil';
 
@@ -117,10 +118,10 @@ function StudentView({
                 cardName: "Health Details",
                 data: [{ name: "Allergies", text: "n/a" },
                 { name: "Health Conditions", text: studentInfo.healthDetails },
-                { name: "Behaviral Health", text: studentInfo.additionalInfo }]
+                { name: "behavior Health", text: "" }]
             },
             {
-                cardName: "Additional Notes",
+                cardName: "Notes",
                 data: [{ name: "Content", text: studentInfo.additionalInfo }]
             }]
         setCardContents(cards);
@@ -222,6 +223,9 @@ function StudentView({
 
     return (
         <div className="main-view-content">
+            <div className="chatbox">
+                <img alt="chatBox" src={ChatBox}></img>
+            </div>
             {/* student list menu*/}
             <div className="users-list">
                 <div className="list-header"> Students </div>
@@ -248,13 +252,6 @@ function StudentView({
                                 <div>{selectStudent.firstName} {selectStudent.middleName} {selectStudent.lastName}</div>
                                 <span>ID: {selectStudent.id} </span>
                             </div>
-                        </div>
-                        <div className="button" >
-                            <Button
-                                text="Input Performance" height="35px"
-                                handleClick={(e) => handleSwitchView("inputPerform", "Input Performance")}
-                                width="250px" borderRadius="20px" fontSize="18px">
-                            </Button>
                         </div>
                     </div>
                     {/* main view switch bars */}
@@ -296,19 +293,28 @@ function StudentView({
                             cardContents.map(card => <InfoCard key={card.cardName} cardTitle={card.cardName} contents={card.data}></InfoCard>)}
                         {/* main view content: student performances page - performance calendar */}
                         {selectView === "studentPerform" &&
-                            <div className="perform-calendar">
-                                <div className="row-titles">
-                                    {["Participation", "Behavior", "Teamwork", "Assignment"].map(
-                                        text => <div key={text} className="row-title"> {text} </div>)}
+                            <div>
+                                <div className="input-perform-button">
+                                    <Button
+                                        text="Input" height="40px"
+                                        handleClick={(e) => handleSwitchView("inputPerform", "Input Performance")}
+                                        width="240px" borderRadius="10px" fontSize="20px">
+                                    </Button>
                                 </div>
-                                {performances.map((col, idx) => {
-                                    return (
-                                        <div key={idx} className={`col-data ${selectPerform && (selectPerform.id === col.id) ? "select" : ""}`}
-                                            onClick={(e) => setSelectPerform(col)}>
-                                            <div>{generateMonthName(col.updateDate)}</div>
-                                            {PERFORMTYPES.map(text => <img key={text} src={LEVELSYMBOLS[col[text]]} alt={text}></img>)}
-                                        </div>)
-                                })}
+                                <div className="perform-calendar">
+                                    <div className="row-titles">
+                                        {["Participation", "Behavior", "Teamwork", "Assignment"].map(
+                                            text => <div key={text} className="row-title"> {text} </div>)}
+                                    </div>
+                                    {performances.map((col, idx) => {
+                                        return (
+                                            <div key={idx} className={`col-data ${selectPerform && (selectPerform.id === col.id) ? "select" : ""}`}
+                                                onClick={(e) => setSelectPerform(col)}>
+                                                <div>{generateMonthName(col.updateDate)}</div>
+                                                {PERFORMTYPES.map(text => <img key={text} src={LEVELSYMBOLS[col[text]]} alt={text}></img>)}
+                                            </div>)
+                                    })}
+                                </div>
                             </div>}
                         {/* main view content: student performances page - selected performance detail */}
                         {selectPerform &&
