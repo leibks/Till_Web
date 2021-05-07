@@ -16,8 +16,8 @@ function Button({
     }
 
     return (
-        <div 
-            className="main-button" 
+        <div
+            className="main-button"
             style={customClass}
             onClick={e => handleClick(e)}>
             {text}

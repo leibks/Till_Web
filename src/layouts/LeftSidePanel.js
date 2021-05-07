@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import AppLogo from '../assets/images/app-logo.svg'
 import Users from '../assets/images/icons/users.svg'
 import Message from '../assets/images/icons/message.svg'
@@ -10,23 +10,32 @@ import { withRouter } from 'react-router-dom';
 const LeftSidePanel = (props) => {
     const [selectBar, setSelectBar] = useState("");
 
-    const switchView = useCallback((e) => {
-        const view = e.target.id
-        setSelectBar(e.target.id);
+    useEffect(() => {
+        const currentPath = props.history.location.pathname.split("/");
+        let currentView = currentPath[currentPath.length - 1]
+        if (currentView === "teacher") {
+            currentView = "main"
+        }
+        setSelectBar(currentView);
+        props.setSelectedView(currentView)
+    }, [props])
+
+    const switchView = useCallback((view) => {
+        setSelectBar(view);
+        props.setSelectedView(view)
         if (view === "main") {
             props.history.push("/teacher")
         } else {
-            props.history.push(`/teacher/${e.target.id}`)
+            props.history.push(`/teacher/${view}`)
         }
-        
-    }, [props.history])
+    }, [props])
 
     return (
         <div className="left-side-panel">
-            <div id="main" className="panel-header" onClick={(e) => switchView(e)}> 
-                <img alt="" src={AppLogo} />
+            <div className="panel-header" onClick={(e) => switchView("main")}>
+                <img alt="logo" src={AppLogo} />
             </div>
-            <div className="panel-content" onClick={(e) => switchView(e)}>
+            <div className="panel-content" onClick={(e) => switchView(e.target.id)}>
                 <div id="students" className={`panel-item ${selectBar === "students" ? "selected-item" : ""}`} >
                     <img id="students" alt="student" src={Users}></img>
                 </div>
@@ -37,7 +46,7 @@ const LeftSidePanel = (props) => {
                     <img id="calendars" alt="calendar" src={Calendar}></img>
                 </div>
                 <div id="settings" className={`panel-item ${selectBar === "settings" ? "selected-item" : ""}`}>
-                     <img id="settings" alt="setting" src={Setting}></img>
+                    <img id="settings" alt="setting" src={Setting}></img>
                 </div>
             </div>
         </div>

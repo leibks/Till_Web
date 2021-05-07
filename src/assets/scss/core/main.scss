@@ -64,29 +64,172 @@ code {
 // main view content: II
 .main-view-content {
     width: 92%;
-    background-color: white;
     min-width: 920px;
     float: right;
+
+    .title {
+        font-size: 24px;
+        margin-bottom: 30px;
+        font-weight: 600;
+    }
+    .subtitle {
+        font-size: 36px;
+        font-weight: 620;
+        margin-bottom: 20px;
+    }
+
+    // dashboard view start
+    .left-outer-container {
+        float: left;
+    }
+
+    .quick-action-container {
+        float: left;
+        height: 180px;
+        width: 240px;
+        margin-right: 20px;
+
+        .box-title {
+            font-size: 18px;
+            margin-top: 5px;
+            float: left;
+            word-wrap: break-word;
+            font-weight: 620;
+            overflow: auto;
+            margin-top: -5px;
+        }
+
+        img {
+            float: left;
+            margin: 0px 20px 0px 0px;
+        }
+
+        .content {
+            height: 140px;
+        }
+
+        // below are different components
+        .display-progress {
+            margin-top: 20px;
+            float: left;
+            width: 100%;
+
+            .text {
+                margin-top: 20px;
+                font-size: 12px;
+                text-align: center;
+            }
+        }
+
+        .input-col {
+            float: left;
+            margin: 20px 0px 0px 0px;
+            width: calc(100%);
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            box-shadow:black 0px 0px 1px;
+            background-color: white;
+            padding: 10px 0px 10px 0px;
+            span {
+                margin-left: 20px;
+            }
+        }
+        .go-button {
+            margin-top: 20px;
+            float: left;
+            width: 100%;
+
+            .main-button {
+                margin: auto;
+                background-color: #FA8334;
+                padding-top: 10px;
+            }
+        }
+    }
+
+    .quick-action-container:hover {
+        box-shadow:black 0px 0px 3px;
+    }
+
+    .student-status-form {
+        margin-top: 220px;
+        width: 700px;
+        height: 400px;
+        cursor: auto;
+        padding: 30px 30px 0px 30px;
+
+        .date {
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .status-bar {
+            width: 100%;
+
+            .bar-title {
+                width: 120px;
+                float: left;
+                font-size: 20px;
+                font-weight: 600;
+                padding: 10px 20px 20px 0px;
+                border-right: 1px solid black;
+            }
+
+            img {
+                height: 100%;
+                margin: 10px 20px 7px 15px;
+            }
+        }
+    }
+
+    @media only screen and (max-width: 1042px) { 
+        .quick-action-container {
+            width: 160px;
+            .display-progress .text {
+                margin-top: 5px;
+            }
+        }
+        .messages-container {
+            width: 250px;
+        }
+        .student-status-form {
+            width: 520px;
+        }
+    }
+
+    .messages-container {
+        width: 400px;
+        height: 650px;
+        margin-left: 20px;
+        float: left;
+        cursor: auto;
+
+        .title {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        .single-message {
+            margin: 20px 0px 20px 0px;
+        }
+    }
+    // dashboard view end
 }
 
-.blank-content {
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    color: $main-shallow;
-    font-size: 30px;
-    margin-top: 300px;
-}
-
-// content header: III
+// content header: II
 .main-content-header {
     height: 50px;
-    border-bottom: 2px solid black;
+    border-bottom: 1px solid black;
     text-align: center;
     font-weight: 600;
     font-size: 30px;
     padding-top: 10px;
     padding-bottom: 10px;
+    margin-left: 8%;
+    text-transform: capitalize;
 }
 
 // profile box: III
@@ -99,18 +242,18 @@ code {
     cursor: pointer;
 }
 
-// users list: III
+
+// users list for students view: III
 .users-list {
     width: 20%;
     min-width: 184px;
     height: 825px;
-    // overflow-y: auto;
-    // overflow-x: auto;
     background-color: $background-color2;
     float: left;
     position: relative;
     text-align: left;
     padding-top: 25px;
+    overflow-y: auto;
 
     .list-header {
         font-size: 24px;
@@ -289,7 +432,7 @@ code {
                 font-size: 16px;
                 height: 240px;
                 float: left;
-                width: 80px;
+                width: 85px;
                 padding: 0px 10px;
 
                 div {

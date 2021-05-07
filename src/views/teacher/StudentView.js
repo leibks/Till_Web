@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import ContentHeader from '../../layouts/ContentHeader';
-import TeacherProfileSample from "../../assets/images/teacher-profile-sample.svg";
 import BoyProfileSample from "../../assets/images/boy-profile-sample.svg";
 import GirlProfileSample from "../../assets/images/girl-profile-sample.svg";
 import UserNav from "../../components/elements/UserNav";
@@ -79,8 +77,9 @@ function StudentView({
     }, [getStudentsByTeacherId, teacherId]);
 
     const handGetStudentPerformance = useCallback(async () => {
-        const performanceList = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectStudent.id);
+        let performanceList = await getStudentPerfoByStudentIdandTeacherId(teacherId, selectStudent.id);
         convertPerforms(performanceList);
+        performanceList = performanceList.reverse();
         setPerformances(performanceList);
     }, [teacherId, selectStudent, getStudentPerfoByStudentIdandTeacherId])
 
@@ -111,7 +110,8 @@ function StudentView({
                 cardName: "Basic Information",
                 data: [{ name: "Full Name", text: selectStudent.firstName + " " + selectStudent.middleName + " " + selectStudent.lastName },
                 { name: "Date of Birth", text: studentInfo.dateOfBirth },
-                { name: "Language", text: studentInfo.firstLanguage + "," + studentInfo.homeLanguage }]
+                { name: "Primary Language", text: studentInfo.firstLanguage },
+                { name: "Home Language", text: studentInfo.homeLanguage }]
             },
             {
                 cardName: "Health Details",
@@ -151,8 +151,8 @@ function StudentView({
             const newPerform = convertBackPerform(inputPerform);
             newPerform["id"] = teacherId + "+" + selectStudent.id + "+" + newPerform["updateDate"];
             await createOrUpdatePerformance(newPerform);
-            alert("create or update performance successfully")
-            handleSwitchView("studentPerform", "student Performance")
+            //alert("create or update performance successfully")
+            handleSwitchView("studentPerform", "student Performance");
         } catch (exception) {
             console.log(exception);
         }
@@ -176,8 +176,8 @@ function StudentView({
         if (teacherId) {
             handleGetStudentsByTeacherId();
             // set default view to student information page
-            setSelectView("studentInfo");
-            setViewHeader("Student Information");
+            setSelectView("studentPerform");
+            setViewHeader("Student Performance");
         }
     }, [teacherId, handleGetStudentsByTeacherId]);
 
@@ -222,8 +222,6 @@ function StudentView({
 
     return (
         <div className="main-view-content">
-            <div className="profile-box"> <img alt="teacher-profile" src={TeacherProfileSample}></img> </div>
-            <ContentHeader headerName="Student View" />
             {/* student list menu*/}
             <div className="users-list">
                 <div className="list-header"> Students </div>
@@ -253,7 +251,7 @@ function StudentView({
                         </div>
                         <div className="button" >
                             <Button
-                                text="Input Peformance" height="35px"
+                                text="Input Performance" height="35px"
                                 handleClick={(e) => handleSwitchView("inputPerform", "Input Performance")}
                                 width="250px" borderRadius="20px" fontSize="18px">
                             </Button>
